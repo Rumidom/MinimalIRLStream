@@ -1,0 +1,2 @@
+/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/.cxx/Debug/246l543o/x86/CMakeFiles/edit_cache.dir
+/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/.cxx/Debug/246l543o/x86/CMakeFiles/rebuild_cache.dir
