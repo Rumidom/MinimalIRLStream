@@ -1,6 +1,6 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.example.minimalstreammonitor"
+3    package="com.example.ui_monitor"
 4    android:versionCode="1"
 5    android:versionName="1.0.0" >
 6
@@ -13,8 +13,8 @@
 13         to allow setting breakpoints, to provide hot reload, etc.
 14    -->
 15    <uses-permission android:name="android.permission.INTERNET" />
-15-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/debug/AndroidManifest.xml:6:5-66
-15-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/debug/AndroidManifest.xml:6:22-64
+15-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/debug/AndroidManifest.xml:6:5-66
+15-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/debug/AndroidManifest.xml:6:22-64
 16    <!--
 17     Required to query activities that can process text, see:
 18         https://developer.android.com/training/package-visibility and
@@ -23,27 +23,27 @@
 21         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
 22    -->
 23    <queries>
-23-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:39:5-44:15
+23-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:39:5-44:15
 24        <intent>
-24-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:40:9-43:18
+24-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:40:9-43:18
 25            <action android:name="android.intent.action.PROCESS_TEXT" />
-25-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:41:13-72
-25-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:41:21-70
+25-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:41:13-72
+25-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:41:21-70
 26
 27            <data android:mimeType="text/plain" />
-27-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:42:13-50
-27-->/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:42:19-48
+27-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:42:13-50
+27-->/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/AndroidManifest.xml:42:19-48
 28        </intent>
 29    </queries>
 30
 31    <permission
 31-->[androidx.core:core:1.13.1] /home/zezo/.gradle/caches/8.10.2/transforms/8cf478dec41eed746328fa8046755ba2/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
-32        android:name="com.example.minimalstreammonitor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+32        android:name="com.example.ui_monitor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
 32-->[androidx.core:core:1.13.1] /home/zezo/.gradle/caches/8.10.2/transforms/8cf478dec41eed746328fa8046755ba2/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
 33        android:protectionLevel="signature" />
 33-->[androidx.core:core:1.13.1] /home/zezo/.gradle/caches/8.10.2/transforms/8cf478dec41eed746328fa8046755ba2/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
 34
-35    <uses-permission android:name="com.example.minimalstreammonitor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+35    <uses-permission android:name="com.example.ui_monitor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 35-->[androidx.core:core:1.13.1] /home/zezo/.gradle/caches/8.10.2/transforms/8cf478dec41eed746328fa8046755ba2/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
 35-->[androidx.core:core:1.13.1] /home/zezo/.gradle/caches/8.10.2/transforms/8cf478dec41eed746328fa8046755ba2/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
 36
@@ -54,9 +54,9 @@
 40        android:debuggable="true"
 41        android:extractNativeLibs="true"
 42        android:icon="@mipmap/ic_launcher"
-43        android:label="minimalstreammonitor" >
+43        android:label="ui_monitor" >
 44        <activity
-45            android:name="com.example.minimalstreammonitor.MainActivity"
+45            android:name="com.example.ui_monitor.MainActivity"
 46            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
 47            android:exported="true"
 48            android:hardwareAccelerated="true"
@@ -90,43 +90,43 @@
 76            android:value="2" />
 77
 78        <provider
-78-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:9-17:20
+78-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:9-17:20
 79            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
-79-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:13-82
-80            android:authorities="com.example.minimalstreammonitor.flutter.image_provider"
-80-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:13-74
+79-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:13-82
+80            android:authorities="com.example.ui_monitor.flutter.image_provider"
+80-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:13-74
 81            android:exported="false"
-81-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:13-37
+81-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:13-37
 82            android:grantUriPermissions="true" >
-82-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:13-47
+82-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:13-47
 83            <meta-data
-83-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:13-16:75
+83-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:13-16:75
 84                android:name="android.support.FILE_PROVIDER_PATHS"
-84-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:17-67
+84-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:17-67
 85                android:resource="@xml/flutter_image_picker_file_paths" />
-85-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:16:17-72
+85-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:16:17-72
 86        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
 87        <service
-87-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:9-31:19
+87-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:9-31:19
 88            android:name="com.google.android.gms.metadata.ModuleDependencies"
-88-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:20:13-78
+88-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:20:13-78
 89            android:enabled="false"
-89-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:21:13-36
+89-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:21:13-36
 90            android:exported="false" >
-90-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:22:13-37
+90-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:22:13-37
 91            <intent-filter>
-91-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:24:13-26:29
+91-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:24:13-26:29
 92                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
-92-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:25:17-94
-92-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:25:25-91
+92-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:25:17-94
+92-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:25:25-91
 93            </intent-filter>
 94
 95            <meta-data
-95-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:28:13-30:36
+95-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:28:13-30:36
 96                android:name="photopicker_activity:0:required"
-96-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:29:17-63
+96-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:29:17-63
 97                android:value="" />
-97-->[:image_picker_android] /home/zezo/AndroidStudioProjects/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:30:17-33
+97-->[:image_picker_android] /home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/build/image_picker_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:30:17-33
 98        </service>
 99
 100        <uses-library
@@ -146,7 +146,7 @@
 107-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/zezo/.gradle/caches/8.10.2/transforms/e80aa748ff6540407d8dba61c0d945fe/transformed/jetified-lifecycle-process-2.7.0/AndroidManifest.xml:24:9-32:20
 108            android:name="androidx.startup.InitializationProvider"
 108-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/zezo/.gradle/caches/8.10.2/transforms/e80aa748ff6540407d8dba61c0d945fe/transformed/jetified-lifecycle-process-2.7.0/AndroidManifest.xml:25:13-67
-109            android:authorities="com.example.minimalstreammonitor.androidx-startup"
+109            android:authorities="com.example.ui_monitor.androidx-startup"
 109-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/zezo/.gradle/caches/8.10.2/transforms/e80aa748ff6540407d8dba61c0d945fe/transformed/jetified-lifecycle-process-2.7.0/AndroidManifest.xml:26:13-68
 110            android:exported="false" >
 110-->[androidx.lifecycle:lifecycle-process:2.7.0] /home/zezo/.gradle/caches/8.10.2/transforms/e80aa748ff6540407d8dba61c0d945fe/transformed/jetified-lifecycle-process-2.7.0/AndroidManifest.xml:27:13-37

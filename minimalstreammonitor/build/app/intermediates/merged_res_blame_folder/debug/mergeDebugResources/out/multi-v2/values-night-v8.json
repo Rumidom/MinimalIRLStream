@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.minimalstreammonitor.app-mergeDebugResources-24:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.example.ui_monitor.app-mergeDebugResources-24:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "/home/zezo/AndroidStudioProjects/minimalstreammonitor/android/app/src/main/res/values-night/styles.xml",
+                    "source": "/home/zezo/AndroidStudioProjects/MinimalIRLStream/minimalstreammonitor/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
