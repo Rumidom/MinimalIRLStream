@@ -3,3 +3,5 @@ MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data 
 
 ![minimalstreamdiagram](docs/minimal_stream_diagram.png)
 
+WIP  ! 🫠
+
