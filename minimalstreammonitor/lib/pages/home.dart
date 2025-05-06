@@ -18,6 +18,11 @@ class MainHomeScreen extends StatefulWidget {
 class _MainHomeScreenState extends State<MainHomeScreen> {
   int _selectedIndex = 0;
   bool loggedIn = false;
+  var redisConn = RedisConnection();
+  var redisUsername = "";
+  var redisServer = "";
+  var redisPassword = "";
+
   void toastmessage(String msg){
     Fluttertoast.showToast(
       msg: msg,
@@ -30,14 +35,15 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     );
   }
 
-  void login(String password,String user,String redisServer){
-    final conn = RedisConnection();
+  void login(String password,String user,String rServ){
     try {
-    conn.connect(redisServer.split(':')[0], int.parse(redisServer.split(':')[1])).then((Command command){
+    redisConn.connect(rServ.split(':')[0], int.parse(rServ.split(':')[1])).then((Command command){
     command.send_object(["AUTH", user, password]).then((var response) {
-        print(response);
         toastmessage("login succesful");
         setState(() {loggedIn = true;}); 
+        redisUsername = user;
+        redisServer = rServ;
+        redisPassword = password;
       });
     });
     } catch (e) {
@@ -45,15 +51,40 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     }
   }
 
-  final List<Widget> widgetOptions = const [
+  Future<List> sendComands(rComandList) async { 
+    var responseList = [];
+    try {
+      Command cmd = await redisConn.connect(redisServer.split(':')[0], int.parse(redisServer.split(':')[1]));
+      var resp = await cmd.send_object(["AUTH", redisUsername, redisPassword]);
+      print("authresp");
+      print(resp);
+
+      for (var rcmd in rComandList) {
+        print(rcmd);
+        var res = await cmd.send_object(rcmd);
+          responseList.add(res);
+          print(res);
+      }
+      return responseList;
+    } catch(e) {
+      toastmessage("connection failed");
+      return responseList;
+    }
+  }
+
+  Future<String> getbbimgKey() async{
+    var returnlist = await sendComands([["GET","imgbbKey"]]);
+    return returnlist[0];
+  }
+
+  late List<Widget> widgetOptions = [
     DataPage(),
     StreamPage(),
-    CameraPage()
+    CameraPage(getkeyfunc: getbbimgKey)
   ];
 
   @override
   Widget build(BuildContext context) {
-    
     return loggedIn ? appPagesScaffold() : LoginPage(loginmethod: login); 
   }
 

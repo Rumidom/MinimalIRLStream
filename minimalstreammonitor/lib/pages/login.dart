@@ -4,10 +4,15 @@ var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeigh
 var datastyle = TextStyle(color: Colors.black,fontSize: 25,fontWeight:FontWeight.bold);
 var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:FontWeight.normal);
 
-class LoginPage extends StatelessWidget{
+class LoginPage extends StatefulWidget{
   const LoginPage({super.key, this.loginmethod});
   final Function(String user,String pass,String serv)? loginmethod;
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController usernameController = TextEditingController(text: 'username');
@@ -73,7 +78,7 @@ class LoginPage extends StatelessWidget{
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: ElevatedButton(
-                  onPressed: () {loginmethod!(passwordController.text,usernameController.text,redisServerController.text);},
+                  onPressed: () {widget.loginmethod!(passwordController.text,usernameController.text,redisServerController.text);},
                   child: const Text('Login')
                 )
             )]

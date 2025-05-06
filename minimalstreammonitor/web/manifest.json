@@ -1,6 +1,6 @@
 {
-    "name": "ui_monitor",
-    "short_name": "ui_monitor",
+    "name": "minimalstreammonitor",
+    "short_name": "minimalstreammonitor",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

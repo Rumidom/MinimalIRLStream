@@ -5,9 +5,14 @@ var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeigh
 var datastyle = TextStyle(color: Colors.black,fontSize: 25,fontWeight:FontWeight.bold);
 var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:FontWeight.normal);
 
-class DataPage extends StatelessWidget{
-  const DataPage({super.key});
+class DataPage extends StatefulWidget{
+  const DataPage({super.key });
   
+  @override
+  State<DataPage> createState() => _DataPageState();
+}
+
+class _DataPageState extends State<DataPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
