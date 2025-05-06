@@ -24,8 +24,8 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.CENTER,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
+      backgroundColor: Colors.grey,
+      textColor: Colors.black,
       fontSize: 16.0
     );
   }
@@ -37,7 +37,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     command.send_object(["AUTH", user, password]).then((var response) {
         print(response);
         toastmessage("login succesful");
-        loggedIn = true;
+        setState(() {loggedIn = true;}); 
       });
     });
     } catch (e) {
