@@ -1,1 +1,0 @@
-/home/zezo/AndroidStudioProjects/minimalstreammonitor/build/app/intermediates/cxx/Debug/246l543o/obj/x86_64
