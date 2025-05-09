@@ -3,6 +3,8 @@ allprojects {
         google()
         mavenCentral()
     }
+    // https://stackoverflow.com/questions/76108428/how-do-i-fix-namespace-not-specified-error-in-android-studio
+
 }
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()

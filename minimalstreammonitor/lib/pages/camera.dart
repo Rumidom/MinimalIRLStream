@@ -11,8 +11,9 @@ var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:Font
 var buttontextstyle = TextStyle(color: Colors.white,fontSize: 15,fontWeight:FontWeight.normal);
 
 class CameraPage extends StatefulWidget{
-  const CameraPage({super.key,  this.getkeyfunc});
+  const CameraPage({super.key,  this.getkeyfunc, this.setMetaDatafunc});
   final  Future<String> Function()?  getkeyfunc ;
+  final  Future<String> Function(Map imData)?  setMetaDatafunc ;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -21,6 +22,7 @@ class CameraPage extends StatefulWidget{
 class _CameraPageState extends State<CameraPage> {
   final imagePicker = ImagePicker();
   var imgbbKey = "";
+  var lastUploadResp = {"timestamp":"","delete_url":"","url":""};
   File? imageFile;
 
 
@@ -46,15 +48,37 @@ class _CameraPageState extends State<CameraPage> {
       String imgb64 = base64Encode(imgfile.readAsBytesSync());
       var payload = { 'key': imgbbKey,'image': imgb64};
       var response = await http.post(uri,body:payload);
-      print(response.body);
+      
+      //print(response.body);
+
       if(response.statusCode == 200){
         toastmessage("image uploaded!");
+        var responseJson = jsonDecode(response.body);
+
+        setState(() {
+        lastUploadResp["url"] = responseJson["data"]["url"];
+        lastUploadResp["delete_url"] = responseJson["data"]["delete_url"];
+        lastUploadResp["timestamp"] = responseJson["data"]["time"].toString();
+        
+        widget.setMetaDatafunc!(lastUploadResp);
+        });
+        print(lastUploadResp);
+        
       }else{
         toastmessage("error uploading image: ${response.statusCode}");
       }
     }else{
       toastmessage("no image to upload");
     }
+  }
+
+  String timestampToDate(int? secsSinceEpoch){
+    if (secsSinceEpoch == null){
+      return "";
+    }
+    var mSecsSinceEpoch = 1000* secsSinceEpoch;
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(mSecsSinceEpoch);
+    return dateTime.toString();
   }
 
   takePicture() async {
@@ -89,13 +113,14 @@ class _CameraPageState extends State<CameraPage> {
                  ),
         ),
         onPressed: () {uploadImage(imageFile);},
-        child: Text("Upload",style: buttontextstyle)))
+        child: Text("Upload",style: buttontextstyle))),
+        Text("Last upload: ${timestampToDate( int.tryParse(lastUploadResp["timestamp"] ?? "" ) )}")
         ]),
         
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
         onPressed: takePicture,
-        backgroundColor: Colors.amberAccent,
+        backgroundColor: Colors.orangeAccent,
         child: const Icon(Icons.camera_alt_outlined) 
       )
     );

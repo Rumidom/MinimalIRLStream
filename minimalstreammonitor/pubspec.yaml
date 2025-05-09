@@ -40,7 +40,9 @@ dependencies:
   localstore: ^1.4.0
   redis: ^4.0.0
   http: ^1.4.0
-  
+  flutter_blue_plus: ^1.35.5
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

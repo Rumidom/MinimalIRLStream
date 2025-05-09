@@ -8,7 +8,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
 
-
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({super.key});
   @override
@@ -77,10 +76,16 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     return returnlist[0];
   }
 
+  Future<String> sendimgMetaData(Map imMetaDataJson) async{
+    var imMD = imMetaDataJson;
+    var returnlist = await sendComands([["HSET","imMetaDataJson","timestamp",imMD["timestamp"],"delete_url",imMD["delete_url"],"url",imMD["url"] ]]);
+    return returnlist[0];
+  }
+
   late List<Widget> widgetOptions = [
     DataPage(),
     StreamPage(),
-    CameraPage(getkeyfunc: getbbimgKey)
+    CameraPage(getkeyfunc: getbbimgKey,setMetaDatafunc:sendimgMetaData)
   ];
 
   @override
