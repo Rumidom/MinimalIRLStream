@@ -20,9 +20,9 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 
 # TODO
 
-*[x] Retrive data from werable device (heartrate,steps,battery,distance)
-*[x] Take pictures and send to cloud database
-*[ ] Queue data with timestamps on cloud database, to be consumed by the video streaming server
-*[ ] Retrive data/pictures from cloud database and assemble image on streaming server
-*[ ] Generate and store video on streaming server
-*[ ] Stream video directly from stream server to youtube
+* [x] Retrive data from werable device (heartrate,steps,battery,distance)
+* [x] Take pictures and send to cloud database
+* [ ] Queue data with timestamps on cloud database, to be consumed by the video streaming server
+* [ ] Retrive data/pictures from cloud database and assemble image on streaming server
+* [ ] Generate and store video on streaming server
+* [ ] Stream video directly from stream server to youtube
