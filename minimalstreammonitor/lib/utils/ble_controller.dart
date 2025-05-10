@@ -1,19 +1,18 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BleController {
+  bool deviceInMemory = false;
   late BluetoothDevice lastConectedDevice;
   late BluetoothService lastConectedDeviceService;
   late BluetoothCharacteristic lastConectedDeviceWriteCharacteristic;
   late BluetoothCharacteristic lastConectedDeviceNotifyCharacteristic;
-  late Function stCallback;
   late Function ntCallback;
   
   BleController(){
     FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   }
 
-  void initializeCallbacks(Function stCback,Function ntCback){
-    stCallback = stCback;
+  void initializeCallbacks(Function ntCback){
     ntCallback = ntCback;
   }
 
@@ -52,8 +51,8 @@ class BleController {
     return device;
   }
 
-  String getDeviceStatus(device){
-    if (device.isConnected){
+  String getlastConectedDeviceStatus(){
+    if (lastConectedDevice.isConnected){
       return "Connected";
     }else{
       return "Desconnected";
@@ -70,9 +69,6 @@ class BleController {
           //    reconnect, or just call connect() again right now
           // 2. you must always re-discover services after disconnection!
           print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
-        stCallback(false,device);
-      }else{
-        stCallback(true,device);
       }
   });
 
@@ -94,6 +90,7 @@ class BleController {
   // cancel to prevent duplicate listeners
   // subscription.cancel();
   lastConectedDevice = device;
+  deviceInMemory = true;
   // Note: You must call discoverServices after every re-connection! rly tho?
   List<BluetoothService> services = await device.discoverServices();
   for (BluetoothService service in services){

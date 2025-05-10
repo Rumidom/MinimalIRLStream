@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import '../utils/ble_controller.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:flutter/material.dart';
+import '../utils/ble_controller.dart';
 import '../ui/style.dart';
 import '../ui/components.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class DataPage extends StatefulWidget{
   const DataPage({super.key,required this.bleObject });
@@ -14,10 +14,10 @@ class DataPage extends StatefulWidget{
 }
 
 class _DataPageState extends State<DataPage> {
-  var steps = 0;
-  var distance = 0;
+  int steps = 0;
+  int distance = 0;
   var mesuring = false;
-  var battery = 0;
+  int battery = 0;
   late Timer t1;
   late Timer t2;
   late Timer t3;
@@ -27,14 +27,13 @@ class _DataPageState extends State<DataPage> {
   int heartRate = 0;
   
   var scannedDevices = [];
-  var lastConectedDevice = {"name":"","mac":"","status":""};
 
   bool scanDevicesFlag = false;
   
   @override
   void initState() {
     super.initState();
-    widget.bleObject.initializeCallbacks(setDeviceStatus,bleNotify);
+    widget.bleObject.initializeCallbacks(bleNotify);
   }
 
   @override
@@ -53,10 +52,15 @@ class _DataPageState extends State<DataPage> {
 
   void onScanPressed() async {
     print("scanpressed");
-
+    setState((){
+      btlistloading = true;
+    });
     var scan = await widget.bleObject.scanDevices();
     print(scan);
-    setState((){scannedDevices = scan;});
+    setState((){
+      scannedDevices = scan;
+      btlistloading = false;
+    });
   }
 
   @override
@@ -73,9 +77,36 @@ if (!btlistloading){
             itemBuilder: (BuildContext context,int index){return bluetoothitem("${scannedDevices[index].advertisementData.advName}","${scannedDevices[index].device.remoteId}");}
             );
 }else{
-    return Text("LOADING...");
+    return LoadingAnimationWidget.threeRotatingDots(
+        color: Colors.orangeAccent,
+        size: 50,
+      );
 }
 
+}
+
+String getLastConnectedDeviceStatus(){
+if (widget.bleObject.deviceInMemory){
+  return widget.bleObject.getlastConectedDeviceStatus();
+}else{
+  return "";
+}
+}
+
+String getDeviceStatus(){
+if (widget.bleObject.deviceInMemory){
+  return widget.bleObject.getlastConectedDeviceStatus();
+}else{
+  return "";
+}
+}
+
+String getDeviceName(){
+if (widget.bleObject.deviceInMemory){
+  return widget.bleObject.lastConectedDevice.advName;
+  }else{
+  return "";
+  }
 }
 
 Scaffold scanScaffold(){
@@ -87,13 +118,9 @@ Scaffold scanScaffold(){
             height:500,
             child: bluetoothScanList(),
             ),
-            ElevatedButton(
-            style: ThemeButton.raisedButtonStyle,
-            onPressed: () { onScanPressed();},
-            child: Text('Scan Devices'),
-            ),
-            Text("Last Connected Device: ${lastConectedDevice["name"]}"), 
-            Text("Status: ${lastConectedDevice["status"]} ")
+            wideButton('Scan Devices', (){onScanPressed();}),
+            Text("Last Connected Device: ${getDeviceName()}"), 
+            Text("Status: ${getDeviceStatus()}")
             ]
         )),
       floatingActionButton: FloatingActionButton(
@@ -110,17 +137,6 @@ Card loadingCard(loadingmessage){
             title: Text(loadingmessage)));
 }
 
-void setDeviceStatus(bool conectedFlag,BluetoothDevice device){
-setState(() { 
-              lastConectedDevice["name"] = device.advName;
-              lastConectedDevice["mac"] = device.remoteId.toString();
-              if (conectedFlag){
-                lastConectedDevice["status"] = "Connected";
-              }else{
-                lastConectedDevice["status"] = "Disconnected";
-              }
-              });
-}
 
 int getMedianOfList(List<int> mList){
      //clone list
@@ -152,13 +168,12 @@ int fromBytesToInt32(int b3, int b2, int b1, int b0) {
 void processActivity(stepslist,distancelist){
   var stepsValue = fromBytesToInt32(0x00, stepslist[0], stepslist[1], stepslist[2]);
   var distanceValue = fromBytesToInt32(0x00, distancelist[0], distancelist[1], distancelist[2]);
-  //print("Activity");
-  //print(steps_value);
-  //print(distance_value);
+  if(mounted){
   setState(() {
     steps = stepsValue;
     distance = distanceValue;
   });
+  }
 }
 
 
@@ -176,9 +191,11 @@ void processHeartRate(value){
     if (value > 0){
       heartRateBuffer.add(value);
     }
+    if(mounted){
     setState((){
     heartRate = getMedianOfList(heartRateBuffer);
     });
+    }
   }
 }
 
@@ -204,15 +221,19 @@ void bleNotify(List<int> bytelist){
 }
 
 Card bluetoothitem (devicename,devicemac){  
-  var device =  widget.bleObject.getDevice(devicemac);
-
    return Card(
             child: ListTile(
             title: Text(devicename),
             subtitle: Text(devicemac),
             trailing: Icon(Icons.speaker_phone_outlined),
-            onTap: () {widget.bleObject.conectToDevice(device);},
+            onTap: (){conectToSelectedDevice(devicemac);}
             ));
+}
+
+void conectToSelectedDevice(devicemac) async {
+var device =  widget.bleObject.getDevice(devicemac);
+await widget.bleObject.conectToDevice(device);
+setState(() {});
 }
 
 void stopMesuring(){
@@ -225,27 +246,30 @@ void startMesuring(){
     setState(() {
       mesuring = true;
     });
-    t1 = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
-      if (!mesuring) {
-        // cancel the timer
-        timer.cancel();
-      }
-      widget.bleObject.ringGetActivity();
-    });
-    t2 = Timer.periodic(const Duration(seconds: 120), (Timer timer) {
-      if (!mesuring) {
-        // cancel the timer
-        timer.cancel();
-      }
-      widget.bleObject.ringGetHeartRate();
-    });
-    t3 = Timer.periodic(const Duration(seconds: 300), (Timer timer) {
+    t1 = makePeriodicTimer(const Duration(seconds: 300),  (Timer timer) {
       if (!mesuring) {
         // cancel the timer
         timer.cancel();
       }
       widget.bleObject.ringGetBattery();
-    });
+    },fireNow: true);
+
+    t2 = makePeriodicTimer(const Duration(seconds: 120),  (Timer timer) {
+      if (!mesuring) {
+        // cancel the timer
+        timer.cancel();
+      }
+      widget.bleObject.ringGetHeartRate();
+    },fireNow: true);
+
+    t3 = makePeriodicTimer(const Duration(seconds: 5),  (Timer timer) {
+      if (!mesuring) {
+        // cancel the timer
+        timer.cancel();
+      }
+      widget.bleObject.ringGetActivity();
+    },fireNow: true);
+
 }
 
 Scaffold werableScaffold(){
@@ -254,11 +278,10 @@ return Scaffold(
         children: 
         [
           SizedBox(height:20),
-          Center(child: Text('Ring Data',style: ThemeText.titlestyle)),
+          Center(child: Text('Werable Data',style: ThemeText.titlestyle)),
           SizedBox(height:20),
           SizedBox(
           height:300,
-          child: Expanded(
           child: GridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 5,
@@ -266,12 +289,12 @@ return Scaffold(
           childAspectRatio: 1.5, 
           children: <Widget>[
             datacell("Steps taken",steps,Icons.directions_walk),
-            datacell("Distance",distance,Icons.east),
+            datacell("Distance",distance.toDouble()/1000,Icons.east),
             datacell("HeartRate",heartRate,Icons.monitor_heart_outlined),
             datacell("Battery",battery,Icons.battery_charging_full),
           ],
-          ))),
-          wideButton(mesurementButtonText(),(){ if (mesuring){stopMesuring();}else{startMesuring();}} )
+          )),
+          wideButton(mesurementButtonText(),(){toggleMesurement();} )
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -282,6 +305,20 @@ return Scaffold(
       )
     );
 }
+
+  void toggleMesurement(){
+  
+  if (widget.bleObject.deviceInMemory){
+    if (mesuring){
+      stopMesuring();
+    }else{
+      startMesuring();
+    }
+  }else{
+    toastmessage("device hasn't been conected yet");
+  }
+
+  } 
 
   String mesurementButtonText(){
     if (mesuring){

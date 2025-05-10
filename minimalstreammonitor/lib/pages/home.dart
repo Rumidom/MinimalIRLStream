@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:redis/redis.dart';
+import '../ui/components.dart';
+import '../utils/ble_controller.dart';
 import 'camera.dart';
 import 'stream.dart';
 import 'data.dart';
 import 'login.dart';
-import 'package:redis/redis.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import '../utils/ble_controller.dart';
 
 var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
 
@@ -23,18 +23,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   var redisUsername = "";
   var redisServer = "";
   var redisPassword = "";
-
-  void toastmessage(String msg){
-    Fluttertoast.showToast(
-      msg: msg,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.grey,
-      textColor: Colors.black,
-      fontSize: 16.0
-    );
-  }
 
   void login(String password,String user,String rServ){
     try {
@@ -98,7 +86,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   Scaffold appPagesScaffold() {
     return Scaffold(
   appBar:appbar_(),
-  body:widgetOptions.elementAt(_selectedIndex),
+  body:IndexedStack( index: _selectedIndex,children: widgetOptions ),
   bottomNavigationBar: BottomNavigationBar(
     elevation: 10,
     currentIndex: _selectedIndex,

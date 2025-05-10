@@ -15,9 +15,9 @@ class LoginPage extends StatefulWidget{
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    TextEditingController usernameController = TextEditingController(text: 'username');
-    TextEditingController passwordController = TextEditingController(text:'password');
-    TextEditingController redisServerController = TextEditingController(text: 'serverurl');
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    TextEditingController redisServerController = TextEditingController();
 
     return Scaffold(
       body:Padding(
