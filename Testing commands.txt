@@ -1,0 +1,3 @@
+adb shell input text 'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com:15456'
+adb shell input text 'riDBvyvtkT9FJWbdJUeTgoOIIry2LP5K'
+adb shell input text 'default'
