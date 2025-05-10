@@ -4,16 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io';
 import 'dart:convert';
-
-var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
-var datastyle = TextStyle(color: Colors.black,fontSize: 25,fontWeight:FontWeight.bold);
-var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:FontWeight.normal);
-var buttontextstyle = TextStyle(color: Colors.white,fontSize: 15,fontWeight:FontWeight.normal);
+import '../ui/style.dart';
 
 class CameraPage extends StatefulWidget{
-  const CameraPage({super.key,  this.getkeyfunc, this.setMetaDatafunc});
-  final  Future<String> Function()?  getkeyfunc ;
-  final  Future<String> Function(Map imData)?  setMetaDatafunc ;
+  const CameraPage({super.key, required this.getkeyfunc, required this.setMetaDatafunc});
+  final  Future<String> Function()  getkeyfunc ;
+  final  Future<String> Function(Map imData)  setMetaDatafunc ;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -24,7 +20,6 @@ class _CameraPageState extends State<CameraPage> {
   var imgbbKey = "";
   var lastUploadResp = {"timestamp":"","delete_url":"","url":""};
   File? imageFile;
-
 
   void toastmessage(String msg){
     Fluttertoast.showToast(
@@ -40,7 +35,7 @@ class _CameraPageState extends State<CameraPage> {
 
   void uploadImage(File? imgfile) async {
     if (imgbbKey == ""){
-      imgbbKey = await widget.getkeyfunc!();
+      imgbbKey = await widget.getkeyfunc();
     }
     if (imgfile != null){
       var uploadURL = "https://api.imgbb.com/1/upload";
@@ -60,7 +55,7 @@ class _CameraPageState extends State<CameraPage> {
         lastUploadResp["delete_url"] = responseJson["data"]["delete_url"];
         lastUploadResp["timestamp"] = responseJson["data"]["time"].toString();
         
-        widget.setMetaDatafunc!(lastUploadResp);
+        widget.setMetaDatafunc(lastUploadResp);
         });
         print(lastUploadResp);
         
@@ -113,7 +108,7 @@ class _CameraPageState extends State<CameraPage> {
                  ),
         ),
         onPressed: () {uploadImage(imageFile);},
-        child: Text("Upload",style: buttontextstyle))),
+        child: Text("Upload",style: ThemeText.buttontextstyle))),
         Text("Last upload: ${timestampToDate( int.tryParse(lastUploadResp["timestamp"] ?? "" ) )}")
         ]),
         

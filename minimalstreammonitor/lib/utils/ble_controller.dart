@@ -1,10 +1,20 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-
 class BleController {
-
+  late BluetoothDevice lastConectedDevice;
+  late BluetoothService lastConectedDeviceService;
+  late BluetoothCharacteristic lastConectedDeviceWriteCharacteristic;
+  late BluetoothCharacteristic lastConectedDeviceNotifyCharacteristic;
+  late Function stCallback;
+  late Function ntCallback;
+  
   BleController(){
     FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
+  }
+
+  void initializeCallbacks(Function stCback,Function ntCback){
+    stCallback = stCback;
+    ntCallback = ntCback;
   }
 
   Future<List> scanDevices() async {
@@ -35,4 +45,121 @@ class BleController {
 
     return scanResults;
   }
+
+  BluetoothDevice getDevice(remoteId){
+    var device = BluetoothDevice.fromId(remoteId);
+    
+    return device;
+  }
+
+  String getDeviceStatus(device){
+    if (device.isConnected){
+      return "Connected";
+    }else{
+      return "Desconnected";
+    }
+  }
+
+ Future<void> conectToDevice(BluetoothDevice device) async {
+
+    // listen for disconnection
+  var subscription = device.connectionState.listen((BluetoothConnectionState state) async {
+      
+      if (state == BluetoothConnectionState.disconnected) {
+          // 1. typically, start a periodic timer that tries to 
+          //    reconnect, or just call connect() again right now
+          // 2. you must always re-discover services after disconnection!
+          print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
+        stCallback(false,device);
+      }else{
+        stCallback(true,device);
+      }
+  });
+
+  // cleanup: cancel subscription when disconnected
+  //   - [delayed] This option is only meant for `connectionState` subscriptions.  
+  //     When `true`, we cancel after a small delay. This ensures the `connectionState` 
+  //     listener receives the `disconnected` event.
+  //   - [next] if true, the the stream will be canceled only on the *next* disconnection,
+  //     not the current disconnection. This is useful if you setup your subscriptions
+  //     before you connect.
+  device.cancelWhenDisconnected(subscription, delayed:true, next:true);
+
+  // Connect to the device
+  await device.connect();
+
+  // Disconnect from device
+  // await device.disconnect();
+
+  // cancel to prevent duplicate listeners
+  // subscription.cancel();
+  lastConectedDevice = device;
+  // Note: You must call discoverServices after every re-connection! rly tho?
+  List<BluetoothService> services = await device.discoverServices();
+  for (BluetoothService service in services){
+    if (service.uuid == Guid('6e40fff0-b5a3-f393-e0a9-e50e24dcca9e')){
+      lastConectedDeviceService = service;
+      break;
+    }
+  }
+
+  for(BluetoothCharacteristic c in lastConectedDeviceService.characteristics) {
+    if (c.properties.write) {
+      lastConectedDeviceWriteCharacteristic = c;
+      print(c);
+    }else if (c.properties.notify){
+      lastConectedDeviceNotifyCharacteristic = c;
+      await characteristicSubscribe(device,lastConectedDeviceNotifyCharacteristic,ntCallback);
+      print(c);
+    }
+  }
+}
+
+Future<void> characteristicSubscribe(BluetoothDevice device,BluetoothCharacteristic characteristic,Function callback) async{
+  final subscription = characteristic.onValueReceived.listen((value) {
+      // onValueReceived is updated:
+      //   - anytime read() is called
+      //   - anytime a notification arrives (if subscribed)
+      callback(value);
+  });
+
+  // cleanup: cancel subscription when disconnected
+  device.cancelWhenDisconnected(subscription);
+
+  // subscribe
+  // Note: If a characteristic supports both **notifications** and **indications**,
+  // it will default to **notifications**. This matches how CoreBluetooth works on iOS.
+  await characteristic.setNotifyValue(true);
+}
+
+  Future<void> connectLastDevice() async{
+    if (!lastConectedDevice.isConnected){
+      await conectToDevice(lastConectedDevice);
+    }
+  }
+
+ Future<void> ringGetBattery() async {
+  await connectLastDevice();
+  BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+  await c.write([0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03]);
+  }
+  
+ Future<void> ringGetActivity() async {
+  await connectLastDevice();
+  BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+  await c.write([0x48, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48]);
+ }
+
+ Future<void> ringGetHeartRate() async {
+  await connectLastDevice();
+  BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+  await c.write([0x69, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x6A]);
+ }
+
+ Future<void> ringBlink() async {
+  await connectLastDevice();
+  BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+  await c.write([0x50, 0x55, 0xAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F]);
+ }
+
 }

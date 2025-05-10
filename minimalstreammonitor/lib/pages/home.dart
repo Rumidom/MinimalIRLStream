@@ -5,6 +5,7 @@ import 'data.dart';
 import 'login.dart';
 import 'package:redis/redis.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../utils/ble_controller.dart';
 
 var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
 
@@ -18,6 +19,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   int _selectedIndex = 0;
   bool loggedIn = false;
   var redisConn = RedisConnection();
+  var bluetoothObject = BleController();
   var redisUsername = "";
   var redisServer = "";
   var redisPassword = "";
@@ -83,7 +85,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 
   late List<Widget> widgetOptions = [
-    DataPage(),
+    DataPage(bleObject:bluetoothObject),
     StreamPage(),
     CameraPage(getkeyfunc: getbbimgKey,setMetaDatafunc:sendimgMetaData)
   ];

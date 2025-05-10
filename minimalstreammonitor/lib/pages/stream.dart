@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
-var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
-var buttontextstyle = TextStyle(color: Colors.white,fontSize: 15,fontWeight:FontWeight.normal);
-var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 15,fontWeight:FontWeight.normal);
+import '../ui/components.dart';
+import '../ui/style.dart';
 
 class StreamPage extends StatelessWidget{
   const StreamPage({super.key});
@@ -13,7 +11,7 @@ class StreamPage extends StatelessWidget{
       body:Column(
         children: [
           SizedBox(height:20),
-          Center(child: Text('Controls',style: titlestyle)),
+          Center(child: Text('Controls',style: ThemeText.titlestyle)),
           wideButton("Stop Stream"),
           wideButton("Log Checkpoint"),
           Container(
@@ -25,26 +23,12 @@ class StreamPage extends StatelessWidget{
           labelText: 'Enter message')
           )),
           wideButton("Send Message"),
-          Center(child: Text('Messages',style: titlestyle)),
+          Center(child: Text('Messages',style: ThemeText.titlestyle)),
           ]
         ),
     );
   }
 
-  Container wideButton(text) {
-    return Container(
-        width: double.infinity,
-        margin:EdgeInsets.symmetric(horizontal: 20),
-        child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey,
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5), // Set the desired radius
-                 ),
-        ),
-        onPressed: () {},
-        child: Text(text,style: buttontextstyle)));
-  }
+
 
 } 

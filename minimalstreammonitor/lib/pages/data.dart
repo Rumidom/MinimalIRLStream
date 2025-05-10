@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../utils/ble_controller.dart';
+import 'dart:typed_data';
+import 'dart:async';
+import '../ui/style.dart';
 
-var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
-var datastyle = TextStyle(color: Colors.black,fontSize: 25,fontWeight:FontWeight.bold);
-var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:FontWeight.normal);
-var raisedButtonStyle = ElevatedButton.styleFrom(
-  foregroundColor: Colors.black87,
-  backgroundColor: Colors.grey[300],
-  minimumSize: Size(88, 36),
-  padding: EdgeInsets.symmetric(horizontal: 16),
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(2)),
-  )
-);
 
 class DataPage extends StatefulWidget{
-  const DataPage({super.key });
-  
+  const DataPage({super.key,required this.bleObject });
+  final BleController bleObject;
   @override
   State<DataPage> createState() => _DataPageState();
 }
 
 class _DataPageState extends State<DataPage> {
-  var ringsteps = 0;
-  var Distance = 0;
-  var HeartRate = 0;
-  var bleObject = BleController();
+  var steps = 0;
+  var distance = 0;
+  var mesuring = false;
+  var battery = 0;
+  bool btlistloading = false;
+  List<int> heartRateBuffer = [];
+  int heartRate = 0;
+  
   var scannedDevices = [];
+  var lastConectedDevice = {"name":"","mac":"","status":""};
 
   bool scanDevicesFlag = false;
   
   @override
   void initState() {
     super.initState();
+    widget.bleObject.initializeCallbacks(setDeviceStatus,bleNotify);
   }
 
   @override
@@ -48,7 +46,8 @@ class _DataPageState extends State<DataPage> {
 
   void onScanPressed() async {
     print("scanpressed");
-    var scan = await bleObject.scanDevices();
+
+    var scan = await widget.bleObject.scanDevices();
     print(scan);
     setState((){scannedDevices = scan;});
   }
@@ -58,6 +57,20 @@ class _DataPageState extends State<DataPage> {
     return scanDevicesFlag?  scanScaffold():werableScaffold();
   }
 
+
+Widget bluetoothScanList(){
+if (!btlistloading){
+    return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: scannedDevices.length,
+            itemBuilder: (BuildContext context,int index){return bluetoothitem("${scannedDevices[index].advertisementData.advName}","${scannedDevices[index].device.remoteId}");}
+            );
+}else{
+    return Text("LOADING...");
+}
+
+}
+
 Scaffold scanScaffold(){
   return Scaffold(
       body: Center(
@@ -65,18 +78,16 @@ Scaffold scanScaffold(){
       children: [
             SizedBox(
             height:500,
-            child:
-            ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: scannedDevices.length,
-            itemBuilder: (BuildContext context,int index){return bluetoothitem("${scannedDevices[index].advertisementData.advName}","${scannedDevices[index].device.remoteId}");}
-            ),
+            child: bluetoothScanList(),
             ),
             ElevatedButton(
-            style: raisedButtonStyle,
+            style: ThemeButton.raisedButtonStyle,
             onPressed: () { onScanPressed();},
             child: Text('Scan Devices'),
-            )]
+            ),
+            Text("Last Connected Device: ${lastConectedDevice["name"]}"), 
+            Text("Status: ${lastConectedDevice["status"]} ")
+            ]
         )),
       floatingActionButton: FloatingActionButton(
       shape: const CircleBorder(),
@@ -87,13 +98,131 @@ Scaffold scanScaffold(){
     );
 }
 
+Card loadingCard(loadingmessage){
+  return Card(child: ListTile(
+            title: Text(loadingmessage)));
+}
+
+void setDeviceStatus(bool conectedFlag,BluetoothDevice device){
+setState(() { 
+              lastConectedDevice["name"] = device.advName;
+              lastConectedDevice["mac"] = device.remoteId.toString();
+              if (conectedFlag){
+                lastConectedDevice["status"] = "Connected";
+              }else{
+                lastConectedDevice["status"] = "Disconnected";
+              }
+              });
+}
+
+int getMedianOfList(List<int> mList){
+     //clone list
+    List<int> clonedList = [];
+    clonedList.addAll(mList);
+
+    //sort list
+    clonedList.sort((a, b) => a.compareTo(b));
+
+    int median;
+
+    int middle = clonedList.length ~/ 2;
+    if (clonedList.length % 2 == 1) {
+      median = clonedList[middle];
+    } else {
+      median = ((clonedList[middle - 1] + clonedList[middle]) / 2.0).round();
+    }
+
+    return median;
+}
+
+int fromBytesToInt32(int b3, int b2, int b1, int b0) {
+  Uint8List bytes = Uint8List.fromList([b3,b2,b1,b0]);
+  Int16List words = Int16List.sublistView(bytes);
+  return words.buffer.asByteData().getInt32(0);
+}
+
+
+void processActivity(stepslist,distancelist){
+  var stepsValue = fromBytesToInt32(0x00, stepslist[0], stepslist[1], stepslist[2]);
+  var distanceValue = fromBytesToInt32(0x00, distancelist[0], distancelist[1], distancelist[2]);
+  //print("Activity");
+  //print(steps_value);
+  //print(distance_value);
+  setState(() {
+    steps = stepsValue;
+    distance = distanceValue;
+  });
+}
+
+
+void processHeartRate(value){
+  //print(value);
+  //print(heartRateBuffer);
+  if (heartRateBuffer.length < 5){
+    if (value > 0){
+      heartRateBuffer.add(value);
+    }
+    if (value == 0){
+      heartRateBuffer = [];
+    }
+  }else{
+    if (value > 0){
+      heartRateBuffer.add(value);
+    }
+    setState((){
+    heartRate = getMedianOfList(heartRateBuffer);
+    });
+  }
+}
+
+void bleNotify(List<int> bytelist){
+  List<int> intlist = bytelist.toList();
+
+  if (intlist[0] == 105){
+    processHeartRate(intlist[3]);
+  }
+  if (intlist[0] == 72){
+    processActivity([intlist[1],intlist[2],intlist[3]],[intlist[10],intlist[11],intlist[12]]);
+  }
+}
+
 Card bluetoothitem (devicename,devicemac){  
+  var device =  widget.bleObject.getDevice(devicemac);
+
    return Card(
             child: ListTile(
             title: Text(devicename),
             subtitle: Text(devicemac),
-            trailing: Icon(Icons.broadcast_on_home)
+            trailing: Icon(Icons.speaker_phone_outlined),
+            onTap: () {widget.bleObject.conectToDevice(device);},
             ));
+}
+
+void stopMesuring(){
+  setState(() {
+    mesuring = false;
+  });
+}
+
+void startMesuring(){
+    setState(() {
+      mesuring = true;
+    });
+    Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+      if (!mesuring) {
+        // cancel the timer
+        timer.cancel();
+      }
+      widget.bleObject.ringGetActivity();
+    });
+    Timer.periodic(const Duration(seconds: 300), (Timer timer) {
+      if (!mesuring) {
+        // cancel the timer
+        timer.cancel();
+      }
+
+      widget.bleObject.ringGetHeartRate();
+    });
 }
 
 Scaffold werableScaffold(){
@@ -102,7 +231,7 @@ return Scaffold(
         children: 
         [
           SizedBox(height:20),
-          Center(child: Text('Data',style: titlestyle)),
+          Center(child: Text('Ring Data',style: ThemeText.titlestyle)),
           SizedBox(height:20),
           Expanded(
           child: GridView.count(
@@ -111,23 +240,35 @@ return Scaffold(
           crossAxisSpacing: 5,
           childAspectRatio: 1.5, 
           children: <Widget>[
-            datacell("Steps taken",ringsteps,Icons.directions_walk),
-            datacell("Distance",Distance,Icons.east),
-            datacell("HeartRate",HeartRate,Icons.monitor_heart_outlined),
-            //datacell("accelerometer",200,Icons.multiple_stop_sharp),
+            datacell("Steps taken",steps,Icons.directions_walk),
+            datacell("Distance",distance,Icons.east),
+            datacell("HeartRate",heartRate,Icons.monitor_heart_outlined),
+            datacell("Battery",battery,Icons.battery_charging_full),
           ],
-          ))
+          )),
+            ElevatedButton(
+            style: ThemeButton.raisedButtonStyle,
+            onPressed: () { if (mesuring){stopMesuring();}else{startMesuring();}},
+            child: mesurementButtonText(),
+            ),
         ]
       ),
       floatingActionButton: FloatingActionButton(
       shape: const CircleBorder(),
       onPressed: (){changeDataPageState(true);},
-      backgroundColor: Colors.orangeAccent
-      ,
+      backgroundColor: Colors.orangeAccent,
       child: const Icon(Icons.bluetooth_searching_outlined) 
       )
     );
 }
+
+  Text mesurementButtonText(){
+    if (mesuring){
+      return Text('Stop Mesuring');
+      }else{
+      return Text('Start Mesuring');
+      }
+  }
 
   Container datacell(datatitle,data,icon) {
   return Container(
@@ -141,9 +282,9 @@ return Scaffold(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
-    Text(datatitle,style: datatitlesstyle),
+    Text(datatitle,style: ThemeText.datatitlesstyle),
     Icon(icon),
-    Text(data.toString(),style: datastyle)
+    Text(data.toString(),style: ThemeText.datastyle)
     ]
   ),
   );
