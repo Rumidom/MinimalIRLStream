@@ -12,8 +12,8 @@ class StreamPage extends StatelessWidget{
         children: [
           SizedBox(height:20),
           Center(child: Text('Controls',style: ThemeText.titlestyle)),
-          wideButton("Stop Stream"),
-          wideButton("Log Checkpoint"),
+          wideButton("Stop Stream",(){}),
+          wideButton("Log Checkpoint",(){}),
           Container(
           width: double.infinity,
           margin:EdgeInsets.symmetric(horizontal: 20),
@@ -22,7 +22,7 @@ class StreamPage extends StatelessWidget{
           border: UnderlineInputBorder(),
           labelText: 'Enter message')
           )),
-          wideButton("Send Message"),
+          wideButton("Send Message",(){}),
           Center(child: Text('Messages',style: ThemeText.titlestyle)),
           ]
         ),

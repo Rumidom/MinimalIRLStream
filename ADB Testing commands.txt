@@ -1,0 +1,49 @@
+adb shell input text 'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com:15456'
+adb shell input text 'riDBvyvtkT9FJWbdJUeTgoOIIry2LP5K'
+adb shell input text 'default'
+
+Sources:
+https://github.com/tahnok/colmi_r02_client/blob/main/colmi_r02_client/steps.py
+https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/ColmiR0xConstants.java
+
+# Last byte is a checksum.
+
+# Mesure HeartRate:
+
+adb shell am broadcast \ -a "nodomain.freeyourgadget.gadgetbridge.ble_api.commands.CHARACTERISTIC_WRITE" \ -e "EXTRA_DEVICE_ADDRESS" "xx:xx:xx:xx:xx:xx" \ -e "EXTRA_CHARACTERISTIC_UUID" "6e400002-b5a3-f393-e0a9-e50e24dcca9e" \ -e "EXTRA_PAYLOAD" "6901000000000000000000000000006A"
+
+# Response:
+
+05-07 09:58:31.525 19869 16153 D nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Characteristic 6e400003-b5a3-f393-e0a9-e50e24dcca9e changed, value: 690100550000000000000000000000BF
+05-07 09:58:31.525 19869 16153 I nodomain.freeyourgadget.gadgetbridge.devices.colmi.ColmiR0xPacketHandler: Received live heart rate response: 85 bpm
+05-07 09:58:32.009 19869 16153 D nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Characteristic 6e400003-b5a3-f393-e0a9-e50e24dcca9e changed, value: 690100560000000000000000000000C0
+05-07 09:58:32.009 19869 16153 I nodomain.freeyourgadget.gadgetbridge.devices.colmi.ColmiR0xPacketHandler: Received live heart rate response: 86 bpm
+
+690100 56 0000000000000000000000C0
+
+56 => heartrate
+
+# Battery charge:
+adb shell am broadcast \ -a "nodomain.freeyourgadget.gadgetbridge.ble_api.commands.CHARACTERISTIC_WRITE" \ -e "EXTRA_DEVICE_ADDRESS" "xx:xx:xx:xx:xx:xx" \ -e "EXTRA_CHARACTERISTIC_UUID" "6e400002-b5a3-f393-e0a9-e50e24dcca9e"\ -e "EXTRA_PAYLOAD" "03000000000000000000000000000003"
+
+# Response: (Valor bruto pode ultrapassar 100%)
+05-07 13:54:33.538 19869 26603 D nodomain.freeyourgadget.gadgetbridge.service.btle.BtLEQueue: characteristic changed: 6e400003-b5a3-f393-e0a9-e50e24dcca9e value: 0x03 0x64 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x67
+05-07 13:54:33.541 19869 26603 D nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Characteristic 6e400003-b5a3-f393-e0a9-e50e24dcca9e changed, value: 03640000000000000000000000000067
+05-07 13:54:33.541 19869 26603 I nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Received battery level response: 100% (charging: false)
+
+# Blink ring (lost function): 
+adb shell am broadcast \ -a "nodomain.freeyourgadget.gadgetbridge.ble_api.commands.CHARACTERISTIC_WRITE" \ -e "EXTRA_DEVICE_ADDRESS" "xx:xx:xx:xx:xx:xx" \ -e "EXTRA_CHARACTERISTIC_UUID" "6e400002-b5a3-f393-e0a9-e50e24dcca9e"\ -e "EXTRA_PAYLOAD" "5055AA0000000000000000000000004F"
+
+# Sync Ring (slow)
+adb shell am broadcast \ -a "nodomain.freeyourgadget.gadgetbridge.ble_api.commands.CHARACTERISTIC_WRITE" \ -e "EXTRA_DEVICE_ADDRESS" "xx:xx:xx:xx:xx:xx" \ -e "EXTRA_CHARACTERISTIC_UUID" "de5bf72a-d711-4e47-af26-65e3012a5dc7"\ -e "EXTRA_PAYLOAD" "430f005f010000000000000000000011"
+
+# Get Activity data ring (APP original Qring)
+adb shell am broadcast \ -a "nodomain.freeyourgadget.gadgetbridge.ble_api.commands.CHARACTERISTIC_WRITE" \ -e "EXTRA_DEVICE_ADDRESS" "xx:xx:xx:xx:xx:xx" \ -e "EXTRA_CHARACTERISTIC_UUID" "6e400002-b5a3-f393-e0a9-e50e24dcca9e"\ -e "EXTRA_PAYLOAD" "48000000000000000000000000000048"
+
+# response:
+05-07 21:37:31.347 19869 26309 D nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Characteristic 6e400003-b5a3-f393-e0a9-e50e24dcca9e changed, value: 480020610000000BCEC100199A00AFC5
+
+05-07 21:43:38.057 19869 23695 D nodomain.freeyourgadget.gadgetbridge.service.devices.colmi.ColmiR0xDeviceSupport: Characteristic 6e400003-b5a3-f393-e0a9-e50e24dcca9e changed, value: 4800 2076 0000000BD6CB00 19AC 00B100
+
+2076 => day steps
+19ac => day distance

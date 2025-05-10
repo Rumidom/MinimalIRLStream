@@ -4,7 +4,7 @@ import '../utils/ble_controller.dart';
 import 'dart:typed_data';
 import 'dart:async';
 import '../ui/style.dart';
-
+import '../ui/components.dart';
 
 class DataPage extends StatefulWidget{
   const DataPage({super.key,required this.bleObject });
@@ -18,6 +18,10 @@ class _DataPageState extends State<DataPage> {
   var distance = 0;
   var mesuring = false;
   var battery = 0;
+  late Timer t1;
+  late Timer t2;
+  late Timer t3;
+
   bool btlistloading = false;
   List<int> heartRateBuffer = [];
   int heartRate = 0;
@@ -35,6 +39,9 @@ class _DataPageState extends State<DataPage> {
 
   @override
   void dispose() {
+    t1.cancel();
+    t2.cancel();
+    t3.cancel();
     super.dispose();
   }
 
@@ -175,6 +182,13 @@ void processHeartRate(value){
   }
 }
 
+void processBatteryCharge(value){
+  if (value > 100){
+    value = 100;
+  }
+  battery = value;
+}
+
 void bleNotify(List<int> bytelist){
   List<int> intlist = bytelist.toList();
 
@@ -183,6 +197,9 @@ void bleNotify(List<int> bytelist){
   }
   if (intlist[0] == 72){
     processActivity([intlist[1],intlist[2],intlist[3]],[intlist[10],intlist[11],intlist[12]]);
+  }
+  if (intlist[0] == 03){
+    processBatteryCharge(intlist[1]);
   }
 }
 
@@ -208,20 +225,26 @@ void startMesuring(){
     setState(() {
       mesuring = true;
     });
-    Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+    t1 = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
       if (!mesuring) {
         // cancel the timer
         timer.cancel();
       }
       widget.bleObject.ringGetActivity();
     });
-    Timer.periodic(const Duration(seconds: 300), (Timer timer) {
+    t2 = Timer.periodic(const Duration(seconds: 120), (Timer timer) {
       if (!mesuring) {
         // cancel the timer
         timer.cancel();
       }
-
       widget.bleObject.ringGetHeartRate();
+    });
+    t3 = Timer.periodic(const Duration(seconds: 300), (Timer timer) {
+      if (!mesuring) {
+        // cancel the timer
+        timer.cancel();
+      }
+      widget.bleObject.ringGetBattery();
     });
 }
 
@@ -233,7 +256,9 @@ return Scaffold(
           SizedBox(height:20),
           Center(child: Text('Ring Data',style: ThemeText.titlestyle)),
           SizedBox(height:20),
-          Expanded(
+          SizedBox(
+          height:300,
+          child: Expanded(
           child: GridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 5,
@@ -245,12 +270,8 @@ return Scaffold(
             datacell("HeartRate",heartRate,Icons.monitor_heart_outlined),
             datacell("Battery",battery,Icons.battery_charging_full),
           ],
-          )),
-            ElevatedButton(
-            style: ThemeButton.raisedButtonStyle,
-            onPressed: () { if (mesuring){stopMesuring();}else{startMesuring();}},
-            child: mesurementButtonText(),
-            ),
+          ))),
+          wideButton(mesurementButtonText(),(){ if (mesuring){stopMesuring();}else{startMesuring();}} )
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -262,11 +283,11 @@ return Scaffold(
     );
 }
 
-  Text mesurementButtonText(){
+  String mesurementButtonText(){
     if (mesuring){
-      return Text('Stop Mesuring');
+      return 'Stop Mesuring';
       }else{
-      return Text('Start Mesuring');
+      return 'Start Mesuring';
       }
   }
 

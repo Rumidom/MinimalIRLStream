@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'style.dart';
 
 
-Container wideButton(text) {
+Container wideButton(text,callback) {
   return Container(
       width: double.infinity,
       margin:EdgeInsets.symmetric(horizontal: 20),
@@ -14,6 +14,6 @@ Container wideButton(text) {
                 borderRadius: BorderRadius.circular(5), // Set the desired radius
                 ),
       ),
-      onPressed: () {},
+      onPressed: callback,
       child: Text(text,style: ThemeText.buttontextstyle)));
 }
