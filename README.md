@@ -10,7 +10,7 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 
 # Supported Werable devices:
 
-### - Colmi R10
+### - Colmi R10 smart ring
 
 # Tested werable acuraccy:  
 
