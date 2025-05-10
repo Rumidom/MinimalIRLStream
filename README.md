@@ -6,7 +6,7 @@ MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data 
 </p>
 
 # Werable data
-for this project I chose a colmi r10 smart ring, as it has been reversed engineered in other projects (<a id='GadgetBridge'> https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/</a>,<a id='colmi r02 client'>https://github.com/tahnok/colmi_r02_client/</a>) and its data is easily acessible and not locked to manufacturer's APP, colmi has other smart rings that share the same API but are branded with diferent names that might also work with this project. I might add devices in the future. 
+for this project I chose a colmi r10 smart ring, as it has been reversed engineered in other projects ((GadgetBridge)[https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/],(colmi r02 client)[https://github.com/tahnok/colmi_r02_client/]) and its data is easily acessible and not locked to manufacturer's APP, colmi has other smart rings that share the same API but are branded with diferent names that might also work with this project. I might add devices in the future. 
 
 # Supported Werable devices:
 
@@ -20,9 +20,9 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 
 # TODO
 
-### [x] Retrive data from werable device (heartrate,steps,battery,distance)
-### [X] Take pictures and send to cloud database
-### [ ] Queue data with timestamps on cloud database, to be consumed by the video streaming server
-### [ ] Retrive data/pictures from cloud database and assemble image on streaming server
-### [ ] Generate and store video on streaming server
-### [ ] Stream video directly from stream server to youtube
+[x] Retrive data from werable device (heartrate,steps,battery,distance)
+[x] Take pictures and send to cloud database
+[ ] Queue data with timestamps on cloud database, to be consumed by the video streaming server
+[ ] Retrive data/pictures from cloud database and assemble image on streaming server
+[ ] Generate and store video on streaming server
+[ ] Stream video directly from stream server to youtube
