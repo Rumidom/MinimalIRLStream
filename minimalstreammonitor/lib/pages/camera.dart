@@ -5,12 +5,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io';
 import 'dart:convert';
 import '../ui/style.dart';
+import '../utils/redis_controller.dart';
 
 class CameraPage extends StatefulWidget{
-  const CameraPage({super.key, required this.getkeyfunc, required this.setMetaDatafunc});
-  final  Future<String> Function()  getkeyfunc ;
-  final  Future<String> Function(Map imData)  setMetaDatafunc ;
-
+  const CameraPage({super.key, required this.redsObject});
+  final RedisController redsObject;
   @override
   State<CameraPage> createState() => _CameraPageState();
 }
@@ -35,7 +34,7 @@ class _CameraPageState extends State<CameraPage> {
 
   void uploadImage(File? imgfile) async {
     if (imgbbKey == ""){
-      imgbbKey = await widget.getkeyfunc();
+      imgbbKey = await widget.redsObject.getbbimgKey();
     }
     if (imgfile != null){
       var uploadURL = "https://api.imgbb.com/1/upload";
@@ -55,7 +54,7 @@ class _CameraPageState extends State<CameraPage> {
         lastUploadResp["delete_url"] = responseJson["data"]["delete_url"];
         lastUploadResp["timestamp"] = responseJson["data"]["time"].toString();
         
-        widget.setMetaDatafunc(lastUploadResp);
+        widget.redsObject.sendImgMetaData(lastUploadResp);
         });
         print(lastUploadResp);
         

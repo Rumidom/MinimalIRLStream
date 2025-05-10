@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:redis/redis.dart';
-import '../ui/components.dart';
 import '../utils/ble_controller.dart';
+import '../utils/redis_controller.dart';
 import 'camera.dart';
 import 'stream.dart';
 import 'data.dart';
@@ -18,76 +17,31 @@ class MainHomeScreen extends StatefulWidget {
 class _MainHomeScreenState extends State<MainHomeScreen> {
   int _selectedIndex = 0;
   bool loggedIn = false;
-  var redisConn = RedisConnection();
   var bluetoothObject = BleController();
-  var redisUsername = "";
-  var redisServer = "";
-  var redisPassword = "";
-
-  void login(String password,String user,String rServ){
-    try {
-    redisConn.connect(rServ.split(':')[0], int.parse(rServ.split(':')[1])).then((Command command){
-    command.send_object(["AUTH", user, password]).then((var response) {
-        toastmessage("login succesful");
-        setState(() {loggedIn = true;}); 
-        redisUsername = user;
-        redisServer = rServ;
-        redisPassword = password;
-      });
-    });
-    } catch (e) {
-      toastmessage("login failed");
-    }
-  }
-
-  Future<List> sendComands(rComandList) async { 
-    var responseList = [];
-    try {
-      Command cmd = await redisConn.connect(redisServer.split(':')[0], int.parse(redisServer.split(':')[1]));
-      var resp = await cmd.send_object(["AUTH", redisUsername, redisPassword]);
-      print("authresp");
-      print(resp);
-
-      for (var rcmd in rComandList) {
-        print(rcmd);
-        var res = await cmd.send_object(rcmd);
-          responseList.add(res);
-          print(res);
-      }
-      return responseList;
-    } catch(e) {
-      toastmessage("connection failed");
-      return responseList;
-    }
-  }
-
-  Future<String> getbbimgKey() async{
-    var returnlist = await sendComands([["GET","imgbbKey"]]);
-    return returnlist[0];
-  }
-
-  Future<String> sendimgMetaData(Map imMetaDataJson) async{
-    var imMD = imMetaDataJson;
-    var returnlist = await sendComands([["HSET","imMetaDataJson","timestamp",imMD["timestamp"],"delete_url",imMD["delete_url"],"url",imMD["url"] ]]);
-    return returnlist[0];
-  }
+  var redisObject = RedisController();
 
   late List<Widget> widgetOptions = [
     DataPage(bleObject:bluetoothObject),
     StreamPage(),
-    CameraPage(getkeyfunc: getbbimgKey,setMetaDatafunc:sendimgMetaData)
+    CameraPage(redsObject:redisObject)
   ];
 
+  void loginFunc(loginResp){
+    setState(() {
+    loggedIn = loginResp;
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    return loggedIn ? appPagesScaffold() : LoginPage(loginmethod: login); 
+    return loggedIn ? appPagesScaffold() : LoginPage(redsObject: redisObject,loginCallback:loginFunc); 
   }
+
 
   Scaffold appPagesScaffold() {
     return Scaffold(
-  appBar:appbar_(),
-  body:IndexedStack( index: _selectedIndex,children: widgetOptions ),
-  bottomNavigationBar: BottomNavigationBar(
+    appBar:appbar_(),
+    body:IndexedStack( index: _selectedIndex,children: widgetOptions ),
+    bottomNavigationBar: BottomNavigationBar(
     elevation: 10,
     currentIndex: _selectedIndex,
     onTap: onTabTapped,

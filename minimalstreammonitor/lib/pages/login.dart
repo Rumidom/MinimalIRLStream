@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import '../utils/redis_controller.dart';
 
 var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
 var datastyle = TextStyle(color: Colors.black,fontSize: 25,fontWeight:FontWeight.bold);
 var datatitlesstyle = TextStyle(color: Colors.black,fontSize: 10,fontWeight:FontWeight.normal);
 
 class LoginPage extends StatefulWidget{
-  const LoginPage({super.key, this.loginmethod});
-  final Function(String user,String pass,String serv)? loginmethod;
+  const LoginPage({super.key, required this.redsObject, required this.loginCallback});
+  final RedisController redsObject;
+  final Function loginCallback;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -78,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 50,
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: ElevatedButton(
-                  onPressed: () {widget.loginmethod!(passwordController.text,usernameController.text,redisServerController.text);},
+                  onPressed: () {widget.redsObject.login(passwordController.text,usernameController.text,redisServerController.text,widget.loginCallback);},
                   child: const Text('Login')
                 )
             )]
