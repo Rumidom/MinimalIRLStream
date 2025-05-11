@@ -26,3 +26,5 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 * [ ] Retrive data/pictures from cloud database and assemble image on streaming server
 * [ ] Generate and store video on streaming server
 * [ ] Stream video directly from stream server to youtube
+
+WIP! 🥜
