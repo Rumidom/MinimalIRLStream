@@ -17,7 +17,6 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 | Colmi R10 Distance (km)| Actual distance (km)| Colmi R10 Steps | hauwei band 8 Steps  |   time   |   date   |
 | ---------------------- | -------------------:| ---------------:| --------------------:|---------:|---------:|
 |                   1.531|                 1.72|             1906|                 2085 |        20|  9/5/2025|
-|                   1.531|                 1.59|             1873|                 1894 |        17| 10/5/2025|
 
 # TODO
 
@@ -27,5 +26,3 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 * [ ] Retrive data/pictures from cloud database and assemble image on streaming server
 * [ ] Generate and store video on streaming server
 * [ ] Stream video directly from stream server to youtube
-
-WIP! 🥜
