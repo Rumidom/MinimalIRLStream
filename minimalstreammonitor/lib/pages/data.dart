@@ -31,7 +31,8 @@ class _DataPageState extends State<DataPage> {
   bool btlistloading = false;
   List<List> heartRateBuffer = [];
   int heartRate = 0;
-  
+  String lastConectedDevice = "";
+  String lastConectedStatus = "";
   var scannedDevices = [];
 
   bool scanDevicesFlag = false;
@@ -39,7 +40,7 @@ class _DataPageState extends State<DataPage> {
   @override
   void initState() {
     super.initState();
-    widget.bleObject.initializeCallbacks(bleNotify);
+    widget.bleObject.initializeCallbacks(bleNotify,onConnectionStatusChange);
   }
 
   @override
@@ -89,14 +90,6 @@ if (!btlistloading){
 
 }
 
-String getLastConnectedDeviceStatus(){
-if (widget.bleObject.deviceInMemory){
-  return widget.bleObject.getlastConectedDeviceStatus();
-}else{
-  return "";
-}
-}
-
 String getDeviceStatus(){
 if (widget.bleObject.deviceInMemory){
   return widget.bleObject.getlastConectedDeviceStatus();
@@ -123,8 +116,8 @@ Scaffold scanScaffold(){
             child: bluetoothScanList(),
             ),
             wideButton('Scan Devices', (){onScanPressed();}),
-            Text("Last Connected Device: ${getDeviceName()}"), 
-            Text("Status: ${getDeviceStatus()}")
+            Text("Last Connected Device: $lastConectedDevice"), 
+            Text("Status: $lastConectedStatus")
             ]
         )),
       floatingActionButton: FloatingActionButton(
@@ -208,10 +201,10 @@ void processHeartRate(value)async{
     setState(() {
     heartRate = getMedianOfList(values);
     });
-    print("Sending: ${heartRate.toString()}, time: ${tS.toString()}, dif: ${(tS-lastSentHeartrateTs).toString()}");
-    await widget.redsObject.pushWerableData("heartrates",'${tS.toString()},${heartRate.toString()}');
     heartRateBuffer = [];
     lastSentHeartrateTs = tS;
+    print("Sending: ${heartRate.toString()}, time: ${tS.toString()}, dif: ${(tS-lastSentHeartrateTs).toString()}");
+    await widget.redsObject.pushWerableData("heartrates",'${tS.toString()},${heartRate.toString()}');
     }
     }
   }
@@ -245,9 +238,21 @@ void processBatteryCharge(value)async{
   }
 }
 
+void onConnectionStatusChange(stat){
+  String statMessage;
+  if (stat){
+    statMessage = "Connected";
+  }else{
+    statMessage = "Disconnected";
+  }
+  setState((){
+  lastConectedDevice = getDeviceName();
+  lastConectedStatus = statMessage;
+  });
+}
+
 void bleNotify(List<int> bytelist){
   List<int> intlist = bytelist.toList();
-
   if (intlist[0] == 105){
     processHeartRate(intlist[3]);
   }
@@ -271,8 +276,13 @@ Card bluetoothitem (devicename,devicemac){
 
 void conectToSelectedDevice(devicemac) async {
 var device =  widget.bleObject.getDevice(devicemac);
+setState((){btlistloading = true;});
 await widget.bleObject.conectToDevice(device);
-setState(() {});
+setState((){
+  btlistloading = false;
+  lastConectedDevice = getDeviceName();
+  lastConectedStatus = getDeviceStatus();
+  });
 }
 
 void stopMesuring(){
@@ -333,7 +343,10 @@ return Scaffold(
             datacell("Battery",battery,Icons.battery_charging_full),
           ],
           )),
-          wideButton(mesurementButtonText(),(){toggleMesurement();} )
+          wideButton(mesurementButtonText(),(){toggleMesurement();}),
+          wideButton("Find Ring (Blink)",(){findRing();}),
+          Text("Last Connected Device: $lastConectedDevice"), 
+          Text("Status: $lastConectedStatus")
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -344,6 +357,14 @@ return Scaffold(
       )
     );
 }
+
+  void findRing(){
+    if (widget.bleObject.deviceInMemory){
+      widget.bleObject.ringBlink();
+    }else{
+      toastmessage("device hasn't been conected yet");
+    }
+  }
 
   void toggleMesurement(){
   

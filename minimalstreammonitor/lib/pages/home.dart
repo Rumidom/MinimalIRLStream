@@ -22,7 +22,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
 
   late List<Widget> widgetOptions = [
     DataPage(bleObject:bluetoothObject,redsObject:redisObject),
-    StreamPage(),
+    StreamPage(redsObject:redisObject),
     CameraPage(redsObject:redisObject)
   ];
 
@@ -67,7 +67,7 @@ void onTabTapped(int index) {
       leading: Container(
         margin:EdgeInsets.all(10),
         alignment: Alignment.center,
-        child: Icon(Icons.menu),
+        child: Icon(Icons.exit_to_app),
       ),
     );
   }

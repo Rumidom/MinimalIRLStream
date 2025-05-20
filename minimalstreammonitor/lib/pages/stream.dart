@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../ui/components.dart';
 import '../ui/style.dart';
+import '../utils/redis_controller.dart';
 
 class StreamPage extends StatelessWidget{
-  const StreamPage({super.key});
+  const StreamPage({super.key,required this.redsObject});
+  final RedisController redsObject;
   
   @override
   Widget build(BuildContext context) {
@@ -12,8 +14,8 @@ class StreamPage extends StatelessWidget{
         children: [
           SizedBox(height:20),
           Center(child: Text('Controls',style: ThemeText.titlestyle)),
-          wideButton("Stop Stream",(){}),
-          wideButton("Log Checkpoint",(){}),
+          wideButton("Logout",(){}),
+          wideButton("Send Checkpoint",(){}),
           Container(
           width: double.infinity,
           margin:EdgeInsets.symmetric(horizontal: 20),
