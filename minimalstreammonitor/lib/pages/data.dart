@@ -1,14 +1,18 @@
+//import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../utils/ble_controller.dart';
 import '../ui/style.dart';
 import '../ui/components.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import '../utils/redis_controller.dart';
+import '../utils/helpers.dart';
 
 class DataPage extends StatefulWidget{
-  const DataPage({super.key,required this.bleObject });
+  const DataPage({super.key,required this.bleObject, required this.redsObject});
   final BleController bleObject;
+  final RedisController redsObject;
   @override
   State<DataPage> createState() => _DataPageState();
 }
@@ -21,9 +25,11 @@ class _DataPageState extends State<DataPage> {
   late Timer t1;
   late Timer t2;
   late Timer t3;
-
+  int lastSentActivityTs = 0;
+  int lastSentHeartrateTs = 0;
+  int lastSentBatteryTs = 0;
   bool btlistloading = false;
-  List<int> heartRateBuffer = [];
+  List<List> heartRateBuffer = [];
   int heartRate = 0;
   
   var scannedDevices = [];
@@ -51,12 +57,10 @@ class _DataPageState extends State<DataPage> {
   }
 
   void onScanPressed() async {
-    print("scanpressed");
     setState((){
       btlistloading = true;
     });
     var scan = await widget.bleObject.scanDevices();
-    print(scan);
     setState((){
       scannedDevices = scan;
       btlistloading = false;
@@ -165,45 +169,80 @@ int fromBytesToInt32(int b3, int b2, int b1, int b0) {
 }
 
 
-void processActivity(stepslist,distancelist){
+void processActivity(stepslist,distancelist) async{
+  var tS = getCurrentTimestamp();
   var stepsValue = fromBytesToInt32(0x00, stepslist[0], stepslist[1], stepslist[2]);
   var distanceValue = fromBytesToInt32(0x00, distancelist[0], distancelist[1], distancelist[2]);
-  if(mounted){
-  setState(() {
+  if((mounted) && (tS-lastSentActivityTs>3)){
+  lastSentActivityTs = tS;
+  await widget.redsObject.pushWerableData("steps",'${tS.toString()},${steps.toString()}' );
+  await widget.redsObject.pushWerableData("distance",'${tS.toString()},${distance.toString()}');
+  setState((){
     steps = stepsValue;
     distance = distanceValue;
   });
   }
+
 }
 
 
-void processHeartRate(value){
-  //print(value);
+void processHeartRate(value)async{
+  var tstamp = getCurrentTimestamp();
   //print(heartRateBuffer);
-  if (heartRateBuffer.length < 5){
+  if (heartRateBuffer.length < 8){
     if (value > 0){
-      heartRateBuffer.add(value);
+      heartRateBuffer.add([value,tstamp]);
     }
     if (value == 0){
       heartRateBuffer = [];
     }
   }else{
     if (value > 0){
-      heartRateBuffer.add(value);
+      heartRateBuffer.add([value,tstamp]);
     }
-    if(mounted){
-    setState((){
-    heartRate = getMedianOfList(heartRateBuffer);
+    if ((mounted)){
+    List<int> values = getValuesFromTimeBuffer(heartRateBuffer);
+    List<int>  tstamps = getTimesFromTimeBuffer(heartRateBuffer);
+    int tS = getMedianOfList(tstamps);
+    if (tS-lastSentHeartrateTs > 30){
+    setState(() {
+    heartRate = getMedianOfList(values);
     });
+    print("Sending: ${heartRate.toString()}, time: ${tS.toString()}, dif: ${(tS-lastSentHeartrateTs).toString()}");
+    await widget.redsObject.pushWerableData("heartrates",'${tS.toString()},${heartRate.toString()}');
+    heartRateBuffer = [];
+    lastSentHeartrateTs = tS;
+    }
     }
   }
 }
 
-void processBatteryCharge(value){
+List<int> getValuesFromTimeBuffer(List<List> buffer){
+  List<int> values = [];
+  for (var item in buffer){
+    values.add(item[0]);
+  }
+  return values;
+}
+
+List<int> getTimesFromTimeBuffer(List<List> buffer){
+  List<int> times = [];
+  for (var item in buffer){
+    times.add(item[1]);
+  }
+  return times;
+}
+
+void processBatteryCharge(value)async{
   if (value > 100){
     value = 100;
   }
-  battery = value;
+  var tS = getCurrentTimestamp();
+  if (tS-lastSentBatteryTs>10){
+  setState(() {battery = value;});
+  lastSentBatteryTs = tS;
+  await widget.redsObject.pushWerableData("batteryCharge",'${tS.toString()},${battery.toString()}');
+  }
 }
 
 void bleNotify(List<int> bytelist){

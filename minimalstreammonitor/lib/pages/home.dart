@@ -21,7 +21,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   var redisObject = RedisController();
 
   late List<Widget> widgetOptions = [
-    DataPage(bleObject:bluetoothObject),
+    DataPage(bleObject:bluetoothObject,redsObject:redisObject),
     StreamPage(),
     CameraPage(redsObject:redisObject)
   ];
