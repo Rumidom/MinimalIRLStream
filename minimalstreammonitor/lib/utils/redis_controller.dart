@@ -7,6 +7,7 @@ class RedisController {
   var redisUsername = "";
   var redisServer = "";
   var redisPassword = "";
+  late Function loginCallback;
   var dataQueueMaxlen = 100;
   late Command rediscmd;
 
@@ -14,6 +15,7 @@ class RedisController {
   
   Future<void> login(String password,String user,String rServ,Function lgCallback) async{
     try {
+    loginCallback = lgCallback;
     rediscmd = await redisConn.connect(rServ.split(':')[0], int.parse(rServ.split(':')[1]));
     var resp = await rediscmd.send_object(["AUTH", user, password]);
     print('AUTH response $resp');
@@ -24,14 +26,14 @@ class RedisController {
     redisPassword = password;
     hasValidCredencials = true;
     lgCallback(true);
-    //cmd.get_connection().close();
+    //rediscmd.get_connection().close();
     }else{
     toastmessage("login failed");
     lgCallback(false);
     }
     } catch (e) {
     print(e);
-    toastmessage("login failed");
+    toastmessage("login failed: $e");
     lgCallback(false);
     }
 
@@ -50,14 +52,18 @@ class RedisController {
       //cmd.get_connection().close();
       return responseList;
     } catch(e) {
-      toastmessage("connection failed");
+      toastmessage("connection failed: $e");
       print("Redis Connection Failed");
-      print(e);
+      rediscmd.get_connection().close();
+      print("Atempting Reconnect");
+      await login(redisPassword,redisUsername,redisServer,loginCallback);
       return responseList;
-      
     }
   }
 
+  void disconnect(){
+    rediscmd.get_connection().close();
+  }
   // this could be more efficient <=
   Future<void> pushWerableData(key,data) async{
     print("pushing werable data: ${key} :${data}");
