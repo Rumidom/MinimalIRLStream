@@ -104,6 +104,10 @@ class BleController {
     if (c.properties.write) {
       lastConectedDeviceWriteCharacteristic = c;
       print(c);
+      print("Setting Ring Date & Time");
+      await ringSetDateTime();
+      print("Setting Auto Ring mesurements to Off");
+      await ringSetAutoMesurementsOff();
     }else if (c.properties.notify){
       lastConectedDeviceNotifyCharacteristic = c;
       await characteristicSubscribe(device,lastConectedDeviceNotifyCharacteristic,ntCallback);
@@ -158,5 +162,50 @@ Future<void> characteristicSubscribe(BluetoothDevice device,BluetoothCharacteris
   BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
   await c.write([0x50, 0x55, 0xAA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F]);
  }
+
+Future<void> ringSetAutoMesurementsOff() async {
+  await connectLastDevice();
+  BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+  print("disabling all automatic mesurements");
+  await c.write([0x16, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1A]);
+  await c.write([0x2c, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E]);
+  await c.write([0x38, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3A]);
+ }
+
+
+Future<void> ringSetDateTime() async {
+await connectLastDevice();
+BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
+List<int> payload = List.filled(16, 0);
+
+DateTime now = DateTime.now();
+print(payload);
+payload[0] = 1;
+payload[1] = byteToBcd(now.year % 2000); //year % 2000
+payload[2] = byteToBcd(now.month);
+payload[3] = byteToBcd(now.day);
+payload[4] = byteToBcd(now.hour);
+payload[5] = byteToBcd(now.minute);
+payload[6] = byteToBcd(now.second);
+payload[7] = 1;
+payload[payload.length-1] = checksum(payload);
+print('payload');
+print(payload);
+await c.write(payload);
+}
+
+int checksum(List byteslist){
+  int sum = 0;
+  for (int e in byteslist) {sum += e;}
+  return sum % 255;
+}
+
+int byteToBcd(int b){
+    int tens = b ~/ 10;
+    int ones = b % 10;
+    return (tens << 4) | ones;
+}
+
+
 
 }
