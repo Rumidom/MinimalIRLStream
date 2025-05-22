@@ -1,4 +1,5 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:minimalstreammonitor/ui/components.dart';
 
 class BleController {
   bool deviceInMemory = false;
@@ -26,11 +27,11 @@ class BleController {
     var subscription = FlutterBluePlus.onScanResults.listen((results) {
           if (results.isNotEmpty) {
             ScanResult r = results.last; // the most recently found device
-            print('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
+            //print('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
             scanResults.add(r);
           }
         },
-        onError: (e) => print(e),
+        onError: (e) => toastmessage(e),
     );
 
     // cleanup: cancel subscription when scanning stops
@@ -70,7 +71,7 @@ class BleController {
           // 1. typically, start a periodic timer that tries to 
           //    reconnect, or just call connect() again right now
           // 2. you must always re-discover services after disconnection!
-          print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
+          //print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
           conStCallback(false);
       }
   });
@@ -108,15 +109,15 @@ class BleController {
   for(BluetoothCharacteristic c in lastConectedDeviceService.characteristics) {
     if (c.properties.write) {
       lastConectedDeviceWriteCharacteristic = c;
-      print(c);
-      print("Setting Ring Date & Time");
+      //print(c);
+      //print("Setting Ring Date & Time");
       await ringSetDateTime();
-      print("Setting Auto Ring mesurements to Off");
+      //print("Setting Auto Ring mesurements to Off");
       await ringSetAutoMesurementsOff();
     }else if (c.properties.notify){
       lastConectedDeviceNotifyCharacteristic = c;
       await characteristicSubscribe(device,lastConectedDeviceNotifyCharacteristic,ntCallback);
-      print(c);
+      //print(c);
     }
   }
 }
@@ -171,7 +172,7 @@ Future<void> characteristicSubscribe(BluetoothDevice device,BluetoothCharacteris
 Future<void> ringSetAutoMesurementsOff() async {
   await connectLastDevice();
   BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
-  print("disabling all automatic mesurements");
+  //print("disabling all automatic mesurements");
   await c.write([0x16, 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1A]);
   await c.write([0x2c, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E]);
   await c.write([0x38, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3A]);
@@ -184,7 +185,7 @@ BluetoothCharacteristic c = lastConectedDeviceWriteCharacteristic;
 List<int> payload = List.filled(16, 0);
 
 DateTime now = DateTime.now();
-print(payload);
+//print(payload);
 payload[0] = 1;
 payload[1] = byteToBcd(now.year % 2000); //year % 2000
 payload[2] = byteToBcd(now.month);
@@ -194,8 +195,7 @@ payload[5] = byteToBcd(now.minute);
 payload[6] = byteToBcd(now.second);
 payload[7] = 1;
 payload[payload.length-1] = checksum(payload);
-print('payload');
-print(payload);
+//print(payload);
 await c.write(payload);
 }
 

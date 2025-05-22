@@ -166,7 +166,7 @@ void processActivity(stepslist,distancelist) async{
   var tS = getCurrentTimestamp();
   var stepsValue = fromBytesToInt32(0x00, stepslist[0], stepslist[1], stepslist[2]);
   var distanceValue = fromBytesToInt32(0x00, distancelist[0], distancelist[1], distancelist[2]);
-  if((mounted) && (tS-lastSentActivityTs>3)){
+  if((mounted) && (tS-lastSentActivityTs>3) && (stepsValue != 0) && (distanceValue != 0)){
   lastSentActivityTs = tS;
   await widget.redsObject.pushWerableData("steps",'${tS.toString()},${steps.toString()}' );
   await widget.redsObject.pushWerableData("distance",'${tS.toString()},${distance.toString()}');
@@ -203,7 +203,7 @@ void processHeartRate(value)async{
     });
     heartRateBuffer = [];
     lastSentHeartrateTs = tS;
-    print("Sending: ${heartRate.toString()}, time: ${tS.toString()}, dif: ${(tS-lastSentHeartrateTs).toString()}");
+    //print("Sending: ${heartRate.toString()}, time: ${tS.toString()}, dif: ${(tS-lastSentHeartrateTs).toString()}");
     await widget.redsObject.pushWerableData("heartrates",'${tS.toString()},${heartRate.toString()}');
     }
     }
