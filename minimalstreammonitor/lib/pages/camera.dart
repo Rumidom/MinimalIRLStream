@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:convert';
 import '../ui/style.dart';
 import '../utils/redis_controller.dart';
+import '../utils/helpers.dart';
 
 class CameraPage extends StatefulWidget{
   const CameraPage({super.key, required this.redsObject});
@@ -33,6 +34,7 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   void uploadImage(File? imgfile) async {
+    try{
     if (imgbbKey == ""){
       imgbbKey = await widget.redsObject.getbbimgKey();
     }
@@ -52,17 +54,20 @@ class _CameraPageState extends State<CameraPage> {
         setState(() {
         lastUploadResp["url"] = responseJson["data"]["url"];
         lastUploadResp["delete_url"] = responseJson["data"]["delete_url"];
-        lastUploadResp["timestamp"] = responseJson["data"]["time"].toString();
-        
+        //lastUploadResp["timestamp"] = responseJson["data"]["time"].toString(); //timestamp of upload
+        lastUploadResp["timestamp"] = getCurrentTimestampStr(); //timestamp when image was taken
         widget.redsObject.sendImgMetaData(lastUploadResp);
         });
-        print(lastUploadResp);
+        //print(lastUploadResp);
         
       }else{
         toastmessage("error uploading image: ${response.statusCode}");
       }
     }else{
       toastmessage("no image to upload");
+      }
+    }catch(e){
+      toastmessage("Error: $e");
     }
   }
 

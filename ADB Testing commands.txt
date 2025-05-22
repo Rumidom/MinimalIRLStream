@@ -2,6 +2,8 @@ adb shell input text 'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com:154
 adb shell input text 'riDBvyvtkT9FJWbdJUeTgoOIIry2LP5K'
 adb shell input text 'default'
 
+adb logcat | grep -E 'nodomain.freeyourgadget.gadgetbridge.devices|nodomain.freeyourgadget.gadgetbridge.service'
+
 Sources:
 https://github.com/tahnok/colmi_r02_client/blob/main/colmi_r02_client/steps.py
 https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/ColmiR0xConstants.java

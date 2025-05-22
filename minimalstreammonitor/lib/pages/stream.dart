@@ -6,7 +6,7 @@ import '../utils/redis_controller.dart';
 class StreamPage extends StatelessWidget{
   const StreamPage({super.key,required this.redsObject});
   final RedisController redsObject;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +14,7 @@ class StreamPage extends StatelessWidget{
         children: [
           SizedBox(height:20),
           Center(child: Text('Controls',style: ThemeText.titlestyle)),
-          wideButton("Logout",(){}),
+          wideButton("Logout",(){redsObject.disconnect();}),
           wideButton("Send Checkpoint",(){}),
           Container(
           width: double.infinity,

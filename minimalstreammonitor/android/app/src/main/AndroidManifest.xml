@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+<uses-permission android:name="android.permission.INTERNET"/>
+
 <!-- Tell Google Play Store that your app uses Bluetooth LE
      Set android:required="true" if bluetooth is necessary -->
 <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
@@ -28,6 +31,7 @@ https://developer.android.com/about/versions/12/features/bluetooth-permissions -
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
