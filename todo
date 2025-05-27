@@ -1,0 +1,5 @@
+- fix black screen on APP startup
+- fix dip in steps graph
+- lock gesture buttons
+- start lists from zero
+
