@@ -27,7 +27,7 @@ def convertRawRedisToDF(mesurement_list,label="mesurement"):
     df = pd.DataFrame({'datetime': x,label: y,})
     return df
 
-def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24)):
+def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24)):
     outputimg = Image.new("RGBA", resolution, bg_color)
     photores = (1280,720)
     if photo == None:
@@ -35,7 +35,7 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,Title = 
     pastepos = (int(photores[0]*0.078),int(photores[1]*0.1389))
     outputimg.paste(photo, pastepos, photo)
     draw = ImageDraw.Draw(outputimg)
-    titlePos = (int(resolution[0]*0.5)-(len(Title)*10),int(resolution[1]*0.02))
+    titlePos = (int(resolution[0]*0.4)-(len(Title)*10),int(resolution[1]*0.02))
     draw.text(titlePos, Title, fill=(255, 255, 255),stroke_width=1, stroke_fill=(0, 0, 0), font=Titlefont)
                             
     if not heartRateData is None:
@@ -43,27 +43,47 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,Title = 
         hrplot = GenerateMiniPlot(df_hr,dataMaxVal = 40,dataMinVal = 130,title="Heartrate")
         pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.08))
         outputimg.paste(hrplot, pastepos, hrplot)
-
+        last_hr = int(df_hr.nlargest(1, ['datetime'])['Heartrate'].iloc[0])
+        heartratebubble = drawDataBubble(str(last_hr)+' bpm',"Heartrate",scale=1.0,iconpath='icons/chart.png')
+        outputimg.paste(heartratebubble, (500,900), heartratebubble)
+        
     if not stepsData is None:
         df_st = convertRawRedisToDF(stepsData,label="Steps")
-        stplot = GenerateMiniPlot(df_st,title= "Steps")
+        stplot = GenerateMiniPlot(df_st,dataMaxVal = 40,dataMinVal = 130,title= "Steps")
         pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))
         outputimg.paste(stplot, pastepos, stplot)
+        last_steps = int(df_st.nlargest(1, ['datetime'])['Steps'].iloc[0])    
+        stepsbubble = drawDataBubble(last_steps,"Steps",scale=1.0,iconpath='icons/steps.png')
+        outputimg.paste(stepsbubble, (200,900), stepsbubble)
+
+    if not distanceData is None:
+        df_dst = convertRawRedisToDF(distanceData,label="Distance")
+        last_dst_2 = df_dst.nlargest(2, ['datetime'])
+        last_dst = format(last_dst_2['Distance'].iloc[0]/1000, ".2f")
+        timedelta = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
+        deltaSeconds = timedelta.total_seconds()
+        distancebubble = drawDataBubble(last_dst+" Km","Distance",scale=1.0,iconpath='icons/distance.png')
+        outputimg.paste(distancebubble, (800,900), distancebubble)
+        deltaDist = last_dst_2['Distance'].iloc[0] - last_dst_2['Distance'].iloc[1] 
+        deltaTime = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
+        speedbubble = drawDataBubble(str(int(deltaDist/deltaSeconds))+" m/s","Speed",scale=1.0,iconpath='icons/speed.png')
+        outputimg.paste(speedbubble, (1100,900), speedbubble)
         
     return outputimg
 
-def GenerateMiniPlot(df_data,dataMaxVal = None,dataMinVal = None,title="Mesurement"):
+def GenerateMiniPlot(df_data,dataMaxVal = 40,dataMinVal = 130,title="Mesurement"):
     textcolor = (0.9,0.9,0.9)
     fig = plt.figure(figsize=(5, 3))
-    sns.set_style("darkgrid", {"axes.edgecolor":".9","grid.color": ".9","axes.facecolor": (63/255, 65/255, 85/255)})
+    sns.set_style("darkgrid", {'grid.linestyle': ':',"axes.edgecolor":".9","grid.color": ".9","axes.facecolor": (63/255, 65/255, 85/255)})
     df_keys = df_data.keys()
-    ax = sns.lineplot(data=df_data,color='black', x=df_keys[0], y=df_keys[1])
+    ax = sns.lineplot(data=df_data,color='white', linewidth = 3,x=df_keys[0], y=df_keys[1])
     ax.tick_params(axis='x', rotation=-45,labelcolor=textcolor)
     ax.tick_params(axis='y',labelcolor=textcolor)
-    ax.set_title(title, color=textcolor)
+    ax.set_title(title, color=textcolor,fontsize=18,weight='bold')
     ax.set(xlabel=None)
     ax.set(ylabel=None)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.tick_params(labelsize=15)
     if (not dataMaxVal is None) and (not dataMinVal is None) > 0:
         plt.ylim(dataMaxVal, dataMinVal)
     byio = io.BytesIO()

@@ -16,6 +16,11 @@ p.psubscribe('__keyspace@0__:steps')
 p.psubscribe('__keyspace@0__:distance')
 p.psubscribe('__keyspace@0__:imMetaDataJson')
 
+bbimgKey  = "40c55ae70e20ccebe2d7e90343434180"
+
+def setbbimgKey():
+    r.set('imgbbKey',bbimgKey)
+
 def getImgJson():
     return r.hgetall('imMetaDataJson')
     
@@ -23,10 +28,15 @@ def getData(r,key):
     return r.lrange(key,0,99)
 
 def getLastDataUpdate(r,key):
-    return r.lrange("distance",0,0)[0]
+    l = r.lrange(key,0,0)
+    if len(l) == 1:
+        return l[0]
+    return None
     
-def addData(List,data):
-    List.insert(0, data)
-    List.pop()
+def addData(l,data):
+    l.insert(0, data)
+    if len(l) > 99:
+        l.pop()
 
-
+def flushServer():
+    return r.flushdb()
