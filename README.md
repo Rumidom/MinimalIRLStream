@@ -9,6 +9,7 @@ MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data 
 
 https://github.com/user-attachments/assets/23ed73f2-22d6-491b-b28c-e596c1ad429c
 
+video is sped up (frames are displayed at 1 FPS but were recived at longer variable intervals)
 # Werable data
 for this project I chose a colmi r10 smart ring, as it has been reversed engineered in other projects ( [GadgetBridge](https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/) , [colmi r02 client](https://github.com/tahnok/colmi_r02_client/) ) and its data is easily acessible (not locked to manufacturer's APP), colmi has other smart rings that share the same or similar API and might also work with this project. I might add devices in the future. 
 
