@@ -2,4 +2,9 @@
 - fix dip in steps graph
 - lock gesture buttons
 - start lists from zero
-
+- stream controls and status on app
+- send exceptions to server
+- generate video 
+- add no internet warning on app
+- add "signal lost" "mesurement log off" on server 
+- fix auto remove https// from Login screen

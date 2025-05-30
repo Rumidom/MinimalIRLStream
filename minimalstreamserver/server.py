@@ -5,6 +5,8 @@ import utils.redisfunc as rds
 import utils.UI as ui
 from datetime import datetime
 import os
+from wakepy import keep
+
 
 print('Starting')
 
@@ -20,7 +22,7 @@ StartingDateTime = datetime.now()
 foldername = StartingDateTime.strftime("SessionImages_%Y-%m-%d_%H_%M_%S")
 
 def saveImage(im):
-    current_datetime = datetime.datetime.now()
+    current_datetime = datetime.now()
     timestamp = current_datetime.timestamp()
     if not os.path.exists(foldername):
         os.makedirs(foldername)
@@ -44,34 +46,35 @@ rds.setbbimgKey()
 
 DataDict = {'steps':rds.getData(rds.r,'steps'),'distance':rds.getData(rds.r,'distance'),'heartrates':rds.getData(rds.r,'heartrates')}
 print("Data: ", DataDict)
-while True:
-    message = rds.p.get_message()
-    event, values = window.read(timeout=10)
-    
-    if event == sg.WINDOW_CLOSED:
-        break
-    
-    if message:
-        #print(message)
-        key = message['channel'].split('__keyspace@0__:')[1]  
-        if message['data'] == 'lpush':
-            dataUpdate = rds.getLastDataUpdate(rds.r,key)
-            print(key,":",dataUpdate)
-            if dataUpdate != None:
-                rds.addData(DataDict[key],dataUpdate)
-        elif message['data'] == 'hset':
-            if key == 'imMetaDataJson':
-                imJSON = rds.getImgJson()
-                print('URL: ',imJSON['url'],'Timestamp: ',imJSON['timestamp']) 
-                last_Img = ui.downloadImgbb(imJSON,saveToStreamLogs = True,finalimgsize=(1280,720))
+with keep.running():
+    while True:
+        message = rds.p.get_message()
+        event, values = window.read(timeout=10)
         
-        if checkDict(DataDict):
-            frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img)
-            frame.thumbnail((1024, 512))
-            saveImage(frame)
-            window['Image'].update(data=ui.image_to_data(frame), size=(1024,512))
+        if event == sg.WINDOW_CLOSED:
+            break
+        
+        if message:
+            #print(message)
+            key = message['channel'].split('__keyspace@0__:')[1]  
+            if message['data'] == 'lpush':
+                dataUpdate = rds.getLastDataUpdate(rds.r,key)
+                print(key,":",dataUpdate)
+                if dataUpdate != None:
+                    rds.addData(DataDict[key],dataUpdate)
+            elif message['data'] == 'hset':
+                if key == 'imMetaDataJson':
+                    imJSON = rds.getImgJson()
+                    print('URL: ',imJSON['url'],'Timestamp: ',imJSON['timestamp']) 
+                    last_Img = ui.downloadImgbb(imJSON,saveToStreamLogs = True,finalimgsize=(1280,720))
+            
+            if checkDict(DataDict):
+                frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img)
+                saveImage(frame)
+                frame.thumbnail((1024, 512))
+                window['Image'].update(data=ui.image_to_data(frame), size=(1024,512))
 
-    else:
-        time.sleep(0.01)
+        else:
+            time.sleep(0.01)
 
 window.close()
