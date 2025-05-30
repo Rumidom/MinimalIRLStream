@@ -34,9 +34,10 @@ def getLastDataUpdate(r,key):
     return None
     
 def addData(l,data):
-    l.insert(0, data)
-    if len(l) > 99:
-        l.pop()
+    if data.split(',')[1] != '0': #Fix later
+        l.insert(0, data)
+        if len(l) > 99:
+            l.pop()
 
 def flushServer():
     return r.flushdb()
