@@ -1,5 +1,5 @@
 # MinimalIRLStream
-MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data such as heartrate,oxygen level,stepcount and position is sent from your phone and wearables to a cloud database from which a server or desktop composes that data into a video stream, this saves bandwith and is ideal for Outdoors activities Streams where high speed internet is not available.
+MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data such as heartrate, oxygen level, stepcount and position is sent from your phone and wearables to a cloud database from which a server or desktop composes that data into a video stream, this saves bandwith and is ideal for Outdoors activities Streams where high speed internet is not available.
 
 <p align="center">
   <img src="https://github.com/Rumidom/MinimalIRLStream/blob/main/docs/minimal_stream_diagram.png" alt="How it works diagram"/>
@@ -10,7 +10,7 @@ MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data 
 https://github.com/user-attachments/assets/23ed73f2-22d6-491b-b28c-e596c1ad429c
 
 # Werable data
-for this project I chose a colmi r10 smart ring, as it has been reversed engineered in other projects ( [GadgetBridge](https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/) , [colmi r02 client](https://github.com/tahnok/colmi_r02_client/) ) and its data is easily acessible and not locked to manufacturer's APP, colmi has other smart rings that share the same or similar API but are branded with diferent names that might also work with this project. I might add devices in the future. 
+for this project I chose a colmi r10 smart ring, as it has been reversed engineered in other projects ( [GadgetBridge](https://codeberg.org/Freeyourgadget/Gadgetbridge/src/branch/master/app/src/main/java/nodomain/freeyourgadget/gadgetbridge/devices/colmi/) , [colmi r02 client](https://github.com/tahnok/colmi_r02_client/) ) and its data is easily acessible (not locked to manufacturer's APP), colmi has other smart rings that share the same or similar API and might also work with this project. I might add devices in the future. 
 
 # Supported Werable devices:
 
