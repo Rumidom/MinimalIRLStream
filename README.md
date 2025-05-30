@@ -26,7 +26,7 @@ Colmi R10 ring, seems accurate enough when compared with a hauwai band 8 (which 
 
 
 <p align="center">
-  <img src="https://github.com/Rumidom/MinimalIRLStream/blob/main/docs/minimal_stream_diagram.png" alt="Heartrate comparison"/>
+  <img src="https://github.com/Rumidom/MinimalIRLStream/blob/main/docs/Screenshot%20from%202025-05-22%2020-01-07.png" alt="Heartrate comparison"/>
 </p>
 
 # TODO
