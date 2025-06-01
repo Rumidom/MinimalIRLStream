@@ -39,3 +39,5 @@ Colmi R10 ring, seems accurate enough when compared with a hauwai band 8 (which 
 * [ ] Generate and store video on streaming server
 * [ ] Stream video directly from stream server to youtube
 * [ ] Add map and live location
+
+1FAA4 be my guest
