@@ -8,3 +8,5 @@
 - add no internet warning on app
 - add "signal lost" "mesurement log off" on server 
 - fix auto remove https// from Login screen
+- fix OS killing script (probably using too much memory)
+- fix server disconnecting after changing from WIFI to 4G 
