@@ -32,12 +32,14 @@ def getLastDataUpdate(r,key):
     if len(l) == 1:
         return l[0]
     return None
+
     
 def addData(l,data):
     if data.split(',')[1] != '0': #Proper fix later
         l.insert(0, data)
         if len(l) > 50:
             l.pop()
+
 
 def flushServer():
     return r.flushdb()
