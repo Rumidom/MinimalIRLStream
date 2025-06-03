@@ -1,12 +1,8 @@
-- fix black screen on APP startup
-- fix dip in steps graph
-- lock gesture buttons
-- start lists from zero
+- fix dip in steps graph (half way there)
 - stream controls and status on app
 - send exceptions to server
 - generate video 
 - add no internet warning on app
 - add "signal lost" "mesurement log off" on server 
-- fix auto remove https// from Login screen
 - fix OS killing script (probably using too much memory)
 - fix server disconnecting after changing from WIFI to 4G 
