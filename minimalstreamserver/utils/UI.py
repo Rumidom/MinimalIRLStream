@@ -42,7 +42,13 @@ def drawDataBubble(data,label,offset=0,scale=1.0,iconpath='icons/steps.png'):
     img.paste(icon, (pos[0], pos[1]))
     return img
 
-def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24)):
+def subtractFirstItem(df):
+    first_instance = df.iloc[-1]
+    #df_hr.apply(lambda x:x-first_instance.to_numpy()[1])
+    df[df.columns[1]] = df[df.columns[1]]-first_instance.to_numpy()[1]
+    return df
+    
+def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24), startFromZero =False):
     outputimg = Image.new("RGBA", resolution, bg_color)
     photores = (1280,720)
     if photo == None:
@@ -52,7 +58,7 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
     draw = ImageDraw.Draw(outputimg)
     titlePos = (int(resolution[0]*0.4)-(len(Title)*10),int(resolution[1]*0.02))
     draw.text(titlePos, Title, fill=(255, 255, 255),stroke_width=1, stroke_fill=(0, 0, 0), font=Titlefont)
-                            
+    
     if not heartRateData is None:
         df_hr = convertRawRedisToDF(heartRateData,label="Heartrate")
         hrplot = GenerateMiniPlot(df_hr,dataMaxVal = 40,dataMinVal = 130,title="Heartrate")
@@ -63,6 +69,8 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         outputimg.paste(heartratebubble, (500,900), heartratebubble)
         
     if not stepsData is None:
+        if startFromZero:
+            df_st = subtractFirstItem(df_st)
         df_st = convertRawRedisToDF(stepsData,label="Steps")
         stplot = GenerateMiniPlot(df_st,title= "Steps")
         pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))
@@ -72,6 +80,8 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         outputimg.paste(stepsbubble, (200,900), stepsbubble)
 
     if not distanceData is None:
+        if startFromZero:
+            df_dst = subtractFirstItem(df_dst)
         df_dst = convertRawRedisToDF(distanceData,label="Distance")
         last_dst_2 = df_dst.nlargest(2, ['datetime'])
         last_dst = format(last_dst_2['Distance'].iloc[0]/1000, ".2f")
@@ -83,7 +93,7 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         outputimg.paste(distancebubble, (800,900), distancebubble)
         deltaDist = last_dst_2['Distance'].iloc[0] - last_dst_2['Distance'].iloc[1] 
         deltaTime = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
-        speedbubble = drawDataBubble(str(int(deltaDist/deltaSeconds))+" m/s","Speed",scale=1.0,iconpath='icons/speed.png')
+        speedbubble = drawDataBubble("{:.1f}".format(deltaDist/deltaSeconds)+" m/s","Speed",scale=1.0,iconpath='icons/speed.png')
         outputimg.paste(speedbubble, (1100,900), speedbubble)
         
     return outputimg

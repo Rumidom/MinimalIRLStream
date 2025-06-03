@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
     TextEditingController redisServerController = TextEditingController();
 
     return Scaffold(
-      body:Padding(
+      body:PopScope(canPop: false,child:Padding(
         padding: const EdgeInsets.all(10),
         child: ListView(
           children: <Widget>[
@@ -48,6 +48,11 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(10),
               child: TextField(
                 controller: redisServerController,
+                  onChanged: (newText) {
+                if (newText.contains("https://")){
+                  redisServerController.text = newText.replaceRange(newText.indexOf("https://"), newText.indexOf("https://") + "https://".length, "");
+                } 
+                },
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Redis Server',
@@ -86,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
             )]
     )
     )
-    );
+    ));
   }
 }
 

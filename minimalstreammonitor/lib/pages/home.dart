@@ -19,7 +19,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   int _selectedIndex = 0;
   bool loggedIn = false;
   bool screenLock = false;
-  Color opacitycolor = Colors.black;
+  Color opacitycolor = Colors.transparent;
   IconData screenStateIcon = Icons.add_to_home_screen;
   var bluetoothObject = BleController();
   var redisObject = RedisController();
@@ -44,12 +44,13 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   Scaffold appPagesScaffold() {
     return Scaffold(
     appBar:appbar_(),
-    body:AbsorbPointer( absorbing: screenLock,child:ColorFiltered(  
+    body:PopScope(canPop: false,child:AbsorbPointer( absorbing: screenLock,child:ColorFiltered(  
     colorFilter: ColorFilter.mode(
     opacitycolor, // Apply a black tint with 50% opacity
     BlendMode.srcATop, // Use 'srcATop' blend mode
     ), 
-    child:IndexedStack( index: _selectedIndex,children: widgetOptions ))),
+    child:IndexedStack( index: _selectedIndex,children: widgetOptions )))),
+    
     bottomNavigationBar: AbsorbPointer( absorbing: screenLock, child: ColorFiltered(
     colorFilter: ColorFilter.mode(
     opacitycolor, // Apply a black tint with 50% opacity
