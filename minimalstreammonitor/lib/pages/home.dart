@@ -10,9 +10,12 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 var titlestyle = TextStyle(color: Colors.black,fontSize: 18,fontWeight:FontWeight.bold);
 
 class MainHomeScreen extends StatefulWidget {
-  const MainHomeScreen({super.key});
+  MainHomeScreen({super.key});
+  final bluetoothObject = BleController();
+  final redisObject = RedisController();
   @override
   State<MainHomeScreen> createState() => _MainHomeScreenState();
+  
 }
 
 class _MainHomeScreenState extends State<MainHomeScreen> {
@@ -21,13 +24,12 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   bool screenLock = false;
   Color opacitycolor = Colors.transparent;
   IconData screenStateIcon = Icons.add_to_home_screen;
-  var bluetoothObject = BleController();
-  var redisObject = RedisController();
+
 
   late List<Widget> widgetOptions = [
-    DataPage(bleObject:bluetoothObject,redsObject:redisObject),
-    StreamPage(redsObject:redisObject),
-    CameraPage(redsObject:redisObject)
+    DataPage(bleObject:widget.bluetoothObject,redsObject:widget.redisObject),
+    StreamPage(redsObject:widget.redisObject),
+    CameraPage(redsObject:widget.redisObject)
   ];
 
   void loginFunc(loginResp){
@@ -37,7 +39,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return loggedIn ? appPagesScaffold() : LoginPage(redsObject: redisObject,loginCallback:loginFunc); 
+    return loggedIn ? appPagesScaffold() : LoginPage(redsObject: widget.redisObject,loginCallback:loginFunc); 
   }
 
 
@@ -74,6 +76,8 @@ void onTabTapped(int index) {
     _selectedIndex = index;
   });
 }
+
+
 void toggleScreenLock(){
   if (screenLock){
     setState((){
@@ -103,7 +107,7 @@ void toggleScreenLock(){
       elevation: 10,
       leading: IconButton(
         alignment: Alignment.center,
-        onPressed: () {},
+        onPressed: () {widget.redisObject.disconnect();},
         icon: Icon(Icons.exit_to_app)
       ),  actions: [
       IconButton(

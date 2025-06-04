@@ -10,7 +10,7 @@ print('Starting')
 
 layout = [
     [sg.Image('test_img.png', expand_x=True, expand_y=True,key = "Image")],
-    [sg.Multiline(size=(30, 5), key='-MLINE-')]
+    [sg.Multiline(size=(30, 5),disabled = True, autoscroll = True, key='-MLINE-')]
 ]
 
 window = sg.Window('MIRL Server', layout, keep_on_top=True,finalize=True)
@@ -55,7 +55,8 @@ rds.setbbimgKey()
 
 DataDict = {'steps':rds.getData(rds.r,'steps'),'distance':rds.getData(rds.r,'distance'),'heartrates':rds.getData(rds.r,'heartrates')}
 print("Data: ", DataDict)
-
+init_steps = None
+init_dist = None
 while True:
     message = rds.p.get_message()
     event, values = window.read(timeout=10)
@@ -71,18 +72,22 @@ while True:
             if dataUpdate != None:
                 logdata(str(key)+":"+str(dataUpdate))
                 rds.addData(DataDict[key],dataUpdate)
+                if key == 'distance' and init_dist == None:
+                    init_dist = int(dataUpdate.split(",")[1])
+                if key == 'steps' and init_steps == None:
+                    init_steps = int(dataUpdate.split(",")[1])
         elif message['data'] == 'hset':
             if key == 'imMetaDataJson':
                 imJSON = rds.getImgJson()
                 logdata('URL: '+imJSON['url']+'Timestamp: '+imJSON['timestamp']) 
                 last_Img = ui.downloadImgbb(imJSON,saveToStreamLogs = True,finalimgsize=(1280,720))
         
-        #if len(loglist) > 0:
+        if len(loglist) > 0:
             #print(loglist)
-            #window['-MLINE-'].update('\n'.join(loglist))
+            window['-MLINE-'].update('\n'.join(loglist))
 
         if checkDict(DataDict):
-            frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img)
+            frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img,startFromZero = True, init_dist= init_dist, init_steps = init_steps)
             saveImage(frame)
             frame.thumbnail((1024, 512))
             window['Image'].update(data=ui.image_to_data(frame), size=(1024,512))

@@ -1,8 +1,9 @@
 - fix dip in steps graph (half way there)
 - stream controls and status on app
 - send exceptions to server
-- generate video 
+- generate video button
 - add no internet warning on app
-- add "signal lost" "mesurement log off" on server 
+- add "signal lost" "mesurement log off" icons on server 
 - fix OS killing script (probably using too much memory)
-- fix server disconnecting after changing from WIFI to 4G 
+- back to login page on disconnect
+- save password and device data locally 
