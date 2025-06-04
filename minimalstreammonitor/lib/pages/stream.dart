@@ -3,9 +3,16 @@ import '../ui/components.dart';
 import '../ui/style.dart';
 import '../utils/redis_controller.dart';
 
-class StreamPage extends StatelessWidget{
+class StreamPage extends StatefulWidget{
   const StreamPage({super.key,required this.redsObject});
   final RedisController redsObject;
+
+  @override
+  State<StreamPage> createState() => _StreamPageState();
+}
+
+class _StreamPageState extends State<StreamPage> {
+  bool streamingServerStatus = false;
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +20,22 @@ class StreamPage extends StatelessWidget{
       body:Column(
         children: [
           SizedBox(height:20),
+          
+          
+          RichText(
+          text: TextSpan(
+          children: [
+              TextSpan(
+                text: "Streaming Server ",
+                style: ThemeText.titlestyle,
+              ),
+              WidgetSpan(
+                child:  streamingServerStatus ? Icon(Icons.brightness_1_rounded, size: 20,color: Colors.green,): Icon(Icons.brightness_1_rounded , size: 20,color: Colors.grey,)
+              )
+            ],
+          ),
+          ),
           Center(child: Text('Controls',style: ThemeText.titlestyle)),
-          wideButton("Logout",(){redsObject.disconnect();}),
           wideButton("Send Checkpoint",(){}),
           Container(
           width: double.infinity,
@@ -30,7 +51,4 @@ class StreamPage extends StatelessWidget{
         ),
     );
   }
-
-
-
 } 

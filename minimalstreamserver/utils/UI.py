@@ -42,10 +42,9 @@ def drawDataBubble(data,label,offset=0,scale=1.0,iconpath='icons/steps.png'):
     img.paste(icon, (pos[0], pos[1]))
     return img
 
-def subtractFirstItem(df):
-    first_instance = df.iloc[-1]
+def subtractConst(df,const):
     #df_hr.apply(lambda x:x-first_instance.to_numpy()[1])
-    df[df.columns[1]] = df[df.columns[1]]-first_instance.to_numpy()[1]
+    df[df.columns[1]] = df[df.columns[1]]-const
     return df
     
 def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24), startFromZero =False):
@@ -69,9 +68,9 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         outputimg.paste(heartratebubble, (500,900), heartratebubble)
         
     if not stepsData is None:
-        if startFromZero:
-            df_st = subtractFirstItem(df_st)
         df_st = convertRawRedisToDF(stepsData,label="Steps")
+        if startFromZero:
+            df_st = subtractConst(df_st)
         stplot = GenerateMiniPlot(df_st,title= "Steps")
         pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))
         outputimg.paste(stplot, pastepos, stplot)
@@ -80,9 +79,9 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         outputimg.paste(stepsbubble, (200,900), stepsbubble)
 
     if not distanceData is None:
-        if startFromZero:
-            df_dst = subtractFirstItem(df_dst)
         df_dst = convertRawRedisToDF(distanceData,label="Distance")
+        if startFromZero:
+            df_dst = subtractConst(df_dst)
         last_dst_2 = df_dst.nlargest(2, ['datetime'])
         last_dst = format(last_dst_2['Distance'].iloc[0]/1000, ".2f")
         timedelta = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 

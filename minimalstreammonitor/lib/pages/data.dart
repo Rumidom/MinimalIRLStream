@@ -134,6 +134,22 @@ Card loadingCard(loadingmessage){
             title: Text(loadingmessage)));
 }
 
+Widget WerableDataStatus(){
+  return RichText(
+  text: TextSpan(
+    children: [
+      TextSpan(
+        text: "Werable Data ",
+        style: ThemeText.titlestyle,
+      ),
+      WidgetSpan(
+        child:  mesuring ? Icon(Icons.brightness_1_rounded, size: 20,color: Colors.green,): Icon(Icons.brightness_1_rounded , size: 20,color: Colors.grey,)
+      )
+    ],
+  ),
+  );
+
+}
 
 int getMedianOfList(List<int> mList){
      //clone list
@@ -311,7 +327,7 @@ void startMesuring(){
       widget.bleObject.ringGetHeartRate();
     },fireNow: true);
 
-    t3 = makePeriodicTimer(const Duration(seconds: 5),  (Timer timer) {
+    t3 = makePeriodicTimer(const Duration(seconds: 10),  (Timer timer) {
       if (!mesuring) {
         // cancel the timer
         timer.cancel();
@@ -327,7 +343,7 @@ return Scaffold(
         children: 
         [
           SizedBox(height:20),
-          Center(child: Text('Werable Data',style: ThemeText.titlestyle)),
+          Center(child: WerableDataStatus()),
           SizedBox(height:20),
           SizedBox(
           height:300,
