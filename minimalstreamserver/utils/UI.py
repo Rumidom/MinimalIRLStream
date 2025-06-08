@@ -6,7 +6,6 @@ import requests
 from PIL import Image,ImageOps,ImageDraw,ImageFont
 from datetime import datetime
 import io
-import redis
 import time
 
 res = (1920,1080)
@@ -47,7 +46,7 @@ def subtractConst(df,const):
     df[df.columns[1]] = df[df.columns[1]]-const
     return df
     
-def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24), startFromZero =False):
+def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distanceData = None,Title = "IRL Stream" ,photo = None, resolution = res, bg_color = (16, 17, 24), startFromZero =False,init_dist= 0, init_steps = 0):
     outputimg = Image.new("RGBA", resolution, bg_color)
     photores = (1280,720)
     if photo == None:
@@ -59,41 +58,44 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
     draw.text(titlePos, Title, fill=(255, 255, 255),stroke_width=1, stroke_fill=(0, 0, 0), font=Titlefont)
     
     if not heartRateData is None:
-        df_hr = convertRawRedisToDF(heartRateData,label="Heartrate")
-        hrplot = GenerateMiniPlot(df_hr,dataMaxVal = 40,dataMinVal = 130,title="Heartrate")
-        pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.08))
-        outputimg.paste(hrplot, pastepos, hrplot)
-        last_hr = int(df_hr.nlargest(1, ['datetime'])['Heartrate'].iloc[0])
-        heartratebubble = drawDataBubble(str(last_hr)+' bpm',"Heartrate",scale=1.0,iconpath='icons/chart.png')
-        outputimg.paste(heartratebubble, (500,900), heartratebubble)
+        if len(heartRateData) > 0: 
+            df_hr = convertRawRedisToDF(heartRateData,label="Heartrate")
+            hrplot = GenerateMiniPlot(df_hr,dataMaxVal = 40,dataMinVal = 130,title="Heartrate")
+            pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.08))
+            outputimg.paste(hrplot, pastepos, hrplot)
+            last_hr = int(df_hr.nlargest(1, ['datetime'])['Heartrate'].iloc[0])
+            heartratebubble = drawDataBubble(str(last_hr)+' bpm',"Heartrate",scale=1.0,iconpath='icons/chart.png')
+            outputimg.paste(heartratebubble, (500,900), heartratebubble)
         
     if not stepsData is None:
-        df_st = convertRawRedisToDF(stepsData,label="Steps")
-        if startFromZero:
-            df_st = subtractConst(df_st)
-        stplot = GenerateMiniPlot(df_st,title= "Steps")
-        pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))
-        outputimg.paste(stplot, pastepos, stplot)
-        last_steps = int(df_st.nlargest(1, ['datetime'])['Steps'].iloc[0])    
-        stepsbubble = drawDataBubble(last_steps,"Steps",scale=1.0,iconpath='icons/steps.png')
-        outputimg.paste(stepsbubble, (200,900), stepsbubble)
+        if len(stepsData) > 0: 
+            df_st = convertRawRedisToDF(stepsData,label="Steps")
+            if startFromZero:
+                df_st = subtractConst(df_st,init_steps)
+            stplot = GenerateMiniPlot(df_st,title= "Steps")
+            pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))
+            outputimg.paste(stplot, pastepos, stplot)
+            last_steps = int(df_st.nlargest(1, ['datetime'])['Steps'].iloc[0])    
+            stepsbubble = drawDataBubble(last_steps,"Steps",scale=1.0,iconpath='icons/steps.png')
+            outputimg.paste(stepsbubble, (200,900), stepsbubble)
 
     if not distanceData is None:
-        df_dst = convertRawRedisToDF(distanceData,label="Distance")
-        if startFromZero:
-            df_dst = subtractConst(df_dst)
-        last_dst_2 = df_dst.nlargest(2, ['datetime'])
-        last_dst = format(last_dst_2['Distance'].iloc[0]/1000, ".2f")
-        timedelta = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
-        deltaSeconds = timedelta.total_seconds()
-        if deltaSeconds == 0:
-            deltaSeconds = 0.1
-        distancebubble = drawDataBubble(last_dst+" Km","Distance",scale=1.0,iconpath='icons/distance.png')
-        outputimg.paste(distancebubble, (800,900), distancebubble)
-        deltaDist = last_dst_2['Distance'].iloc[0] - last_dst_2['Distance'].iloc[1] 
-        deltaTime = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
-        speedbubble = drawDataBubble("{:.1f}".format(deltaDist/deltaSeconds)+" m/s","Speed",scale=1.0,iconpath='icons/speed.png')
-        outputimg.paste(speedbubble, (1100,900), speedbubble)
+        if len(distanceData) > 1: 
+            df_dst = convertRawRedisToDF(distanceData,label="Distance")
+            if startFromZero:
+                df_dst = subtractConst(df_dst,init_dist)
+            last_dst_2 = df_dst.nlargest(2, ['datetime'])
+            last_dst = format(last_dst_2['Distance'].iloc[0]/1000, ".2f")
+            timedelta = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
+            deltaSeconds = timedelta.total_seconds()
+            if deltaSeconds == 0:
+                deltaSeconds = 0.1
+            distancebubble = drawDataBubble(last_dst+" Km","Distance",scale=1.0,iconpath='icons/distance.png')
+            outputimg.paste(distancebubble, (800,900), distancebubble)
+            deltaDist = last_dst_2['Distance'].iloc[0] - last_dst_2['Distance'].iloc[1] 
+            deltaTime = last_dst_2['datetime'].iloc[0] - last_dst_2['datetime'].iloc[1] 
+            speedbubble = drawDataBubble("{:.1f}".format(deltaDist/deltaSeconds)+" m/s","Speed",scale=1.0,iconpath='icons/speed.png')
+            outputimg.paste(speedbubble, (1100,900), speedbubble)
         
     return outputimg
 

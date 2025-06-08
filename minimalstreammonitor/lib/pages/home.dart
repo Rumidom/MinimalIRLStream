@@ -107,12 +107,14 @@ void toggleScreenLock(){
       elevation: 10,
       leading: IconButton(
         alignment: Alignment.center,
-        onPressed: () {widget.redisObject.disconnect();},
+        onPressed: (){},
+        //onLongPress: () {widget.redisObject.disconnect();},
         icon: Icon(Icons.exit_to_app)
       ),  actions: [
       IconButton(
         alignment: Alignment.center,
-        onPressed: (){toggleScreenLock();},
+        onPressed: (){},
+        onLongPress: (){toggleScreenLock();},
         icon: Icon(screenStateIcon )),
       ],
     );
