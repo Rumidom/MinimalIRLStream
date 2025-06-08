@@ -7,8 +7,11 @@ from datetime import datetime
 import os
 import ffmpeg
 import glob
+import os 
 
-    
+
+dir_path = os.path.dirname(os.path.realpath(__file__))    
+print(dir_path)
 rds = RedisController(
 'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com',
 15456,
@@ -20,7 +23,7 @@ rds = RedisController(
 tab_layout1 = [
     [sg.Image('test_img.png', expand_x=True, expand_y=True,key = "-IMAGE-")],
     [sg.Multiline(size=(30, 5),disabled = True, autoscroll = True, key='-MLINE-')],
-    [sg.Button('Start',key='-START-'),sg.Button('Stop',key='-STOP-',disabled=True), sg.Button('Generate Video', disabled=False,key='-GENVIDEO-'),sg.InputText(key='-VIDEONAMEINPUT-')],
+    [sg.Button('Start',key='-START-'),sg.Button('Stop',key='-STOP-',disabled=True), sg.Button('Generate Video', disabled=False,key='-GENVIDEO-'),sg.InputText(key='-VIDEONAMEINPUT-', enable_events=True),sg.FolderBrowse('select folder',initial_folder=dir_path,key='-FOlDERBROWSER-')],
 ]
 
 tab_layout2 = [
@@ -41,12 +44,11 @@ last_Img = None
 save_images = True
 clear_day = True
 StartingDateTime = datetime.now()
-foldername = StartingDateTime.strftime("SessionImages_%Y-%m-%d_%H_%M_%S")
+foldername = StartingDateTime.strftime("Session_%Y-%m-%d_%H_%M_%S")
 loglist = []
 
-def generate_video(image_folder,videoname):
-    print(image_folder,',',videoname)
-    ffmpeg.input(image_folder+'/*.png', pattern_type='glob', framerate=1).output(videoname+'.mp4',loglevel="quiet").run(overwrite_output=True)
+def generate_video(foldername):
+    ffmpeg.input(foldername+'/*.png', pattern_type='glob', framerate=1).output(foldername+'.mp4',loglevel="quiet").run(overwrite_output=True)
 
 def logdata(msg):
     loglist.append(msg)
@@ -96,13 +98,20 @@ message = None
 while True:
     event, values = window.read(timeout=10)
     
+    if event != '__TIMEOUT__':
+        print(event," : ",values)
+
     if event == sg.WINDOW_CLOSED:
         break
     
+    if event == '-VIDEONAMEINPUT-':
+        print(event,values)
+        window['-VIDEONAMEINPUT-'].Update(values['-VIDEONAMEINPUT-'].replace(dir_path+"/",''))
+
     if event == '-GENVIDEO-':
         print(values)
         logdata('Generating Video')
-        generate_video('Movie - '+values['-VIDEONAMEINPUT-'].split('Images_')[1],values['-VIDEONAMEINPUT-'])
+        generate_video(values['-VIDEONAMEINPUT-'])
 
     if event == '-START-':
         StartServer()
@@ -110,7 +119,7 @@ while True:
         window['-START-'].update(disabled=True)
         window['-STOP-'].update(disabled=False)
         window['-GENVIDEO-'].update(disabled=True)
-        window['-VIDEONAMEINPUT-'].Update('Movie - '+StartingDateTime.strftime("%Y-%m-%d %H_%M_%S"))
+        window['-VIDEONAMEINPUT-'].Update(foldername)
 
     if event == '-STOP-':
         DataDict = {'steps':[],'distance':[],'heartrates':[]}

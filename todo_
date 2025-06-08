@@ -3,7 +3,7 @@
 - send exceptions to server
 - add no internet warning on app
 - add "signal lost" "mesurement log off" icons on server 
-- fix OS killing script (probably using too much memory)
+- fix OS killing script, due to memory leak
 - back to login page on disconnect
 - save password and bt device data locally 
 
