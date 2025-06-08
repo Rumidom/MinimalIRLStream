@@ -106,7 +106,7 @@ while True:
     
     if event == '-VIDEONAMEINPUT-':
         print(event,values)
-        window['-VIDEONAMEINPUT-'].Update(values['-VIDEONAMEINPUT-'].replace(dir_path+"/",''))
+        window['-VIDEONAMEINPUT-'].Update(values['-VIDEONAMEINPUT-'].replace(dir_path,'').replace('/',''))
 
     if event == '-GENVIDEO-':
         print(values)
