@@ -8,7 +8,7 @@ import os
 import ffmpeg
 import glob
 import os 
-
+import gc
 
 dir_path = os.path.dirname(os.path.realpath(__file__))    
 print(dir_path)
@@ -162,4 +162,6 @@ while True:
             saveImage(frame)
             frame.thumbnail((1024, 512))
             window['-IMAGE-'].update(data=ui.image_to_data(frame), size=(1024,512))
+            gc.collect()
+        
 window.close()
