@@ -7,8 +7,7 @@ MinimalIRLStream is a way to IRL Stream with less mobile data. lowbandwith data 
 
 # Walk on the beach (proof of concept)
 
-https://github.com/user-attachments/assets/26ea666e-d5dc-40aa-9ee7-5da70be02d7e
-
+https://github.com/user-attachments/assets/11d67ed4-f4f8-4f8e-a4bd-8826344a75c9
 
 video is sped up (frames are displayed at 1 FPS but were recived at longer variable intervals)
 # Werable data
