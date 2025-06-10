@@ -36,7 +36,7 @@ Colmi R10 ring, seems accurate enough when compared with a hauwai band 8 (which 
 * [x] Take pictures and send to cloud database
 * [x] Queue data with timestamps on cloud database, to be consumed by the video streaming server
 * [x] Retrive data/pictures from cloud database and assemble image on streaming server
-* [ ] Automatically blurry license plates and faces
+* [ ] Automatically blur license plates and faces
 * [ ] Generate and store video on streaming server
 * [ ] Stream video directly from stream server to youtube
 * [ ] Add map and live location
