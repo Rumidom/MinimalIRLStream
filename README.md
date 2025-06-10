@@ -16,7 +16,7 @@ for this project I chose a colmi r10 smart ring, as it has been reversed enginee
 # Supported Werable devices:
 
 ### - Colmi R10 smart ring
-Colmi R10 ring, seems accurate enough when compared with a hauwai band 8 (which acording to online reviews is fairly accurate)
+Colmi R10 ring, seems accurate enough when compared with a hauwai band 8 (which acording to online reviews is fairly accurate), the ring seems to be more acurate when fully charged and at about %60 charge it loses connection 
 
 # Tested werable acuraccy:  
 
