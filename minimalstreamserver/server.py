@@ -99,17 +99,18 @@ while True:
     event, values = window.read(timeout=10)
     
     if event != '__TIMEOUT__':
-        print(event," : ",values)
+        #print(event," : ",values)
+        pass
 
     if event == sg.WINDOW_CLOSED:
         break
     
     if event == '-VIDEONAMEINPUT-':
-        print(event,values)
+        #print(event,values)
         window['-VIDEONAMEINPUT-'].Update(values['-VIDEONAMEINPUT-'].replace(dir_path,'').replace('/',''))
 
     if event == '-GENVIDEO-':
-        print(values)
+        #print(values)
         logdata('Generating Video')
         generate_video(values['-VIDEONAMEINPUT-'])
 
