@@ -71,6 +71,7 @@ def GenerateFrame(Titlefont = Rf, stepsData = None,heartRateData = None,distance
         if len(stepsData) > 0: 
             df_st = convertRawRedisToDF(stepsData,label="Steps")
             if startFromZero:
+                #print('test: ',init_steps)
                 df_st = subtractConst(df_st,init_steps)
             stplot = GenerateMiniPlot(df_st,title= "Steps")
             pastepos = (int(resolution[0]*0.7448),int(resolution[1]*0.45))

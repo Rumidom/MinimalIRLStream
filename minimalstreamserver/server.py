@@ -6,9 +6,9 @@ import utils.UI as ui
 from datetime import datetime
 import os
 import ffmpeg
-import glob
 import os 
 import gc
+import psutil
 
 dir_path = os.path.dirname(os.path.realpath(__file__))    
 print(dir_path)
@@ -19,6 +19,8 @@ rds = RedisController(
 'E-5X|?]B2:Cy0Lso]"_|PqlE*',
 '40c55ae70e20ccebe2d7e90343434180'
 )
+
+mem = psutil.virtual_memory()
 
 tab_layout1 = [
     [sg.Image('test_img.png', expand_x=True, expand_y=True,key = "-IMAGE-")],
@@ -136,6 +138,7 @@ while True:
         message = rds.get_message()
 
     if message:
+        
         #print(message)
         key = message['channel'].split('__keyspace@0__:')[1]  
         if message['data'] == 'lpush':
@@ -145,7 +148,7 @@ while True:
                 rds.addData(DataDict[key],dataUpdate)
                 if key == 'distance' and init_dist == None:
                     init_dist = int(dataUpdate.split(",")[1])
-                if key == 'steps' and init_steps == None:
+                if key == 'steps' and init_steps == None :
                     init_steps = int(dataUpdate.split(",")[1])
 
         elif message['data'] == 'hset':
@@ -163,6 +166,8 @@ while True:
             saveImage(frame)
             frame.thumbnail((1024, 512))
             window['-IMAGE-'].update(data=ui.image_to_data(frame), size=(1024,512))
-            gc.collect()
+        
+        #print("gc: ",gc.collect(), "Free Mem: ",mem.free)
+        gc.collect()
         
 window.close()
