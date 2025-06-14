@@ -8,6 +8,7 @@ from datetime import datetime
 import io
 import time
 
+
 res = (1920,1080)
 Rf = ImageFont.truetype('Roboto-Bold.ttf', int(0.02*res[0]))
 

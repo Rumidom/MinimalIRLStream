@@ -9,45 +9,57 @@ import ffmpeg
 import os 
 import gc
 import psutil
+from utils.anonpill import getImgAnonymized
+import json
+import os
 
-dir_path = os.path.dirname(os.path.realpath(__file__))    
-print(dir_path)
-rds = RedisController(
-'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com',
-15456,
-'streamingserver',
-'E-5X|?]B2:Cy0Lso]"_|PqlE*',
-'40c55ae70e20ccebe2d7e90343434180'
-)
+
+startFromZero = True
+last_Img = None
+StartingDateTime = datetime.now()
+foldername = StartingDateTime.strftime("Session_%Y-%m-%d_%H_%M_%S")
+loglist = []
+settings = {"redisServer": "", "redisPort": "", "redisUser": "", "redisPassword": "", "BBimgKey": "", "startFromZeroSteps": True, "saveFrames": True}
+disablestart = False
+rds = None
+
+if os.path.exists('settings.json'):
+    with open('settings.json') as f:
+        settings = json.load(f)
+    loglist.append("Settings file found")
+else:
+    loglist.append("Settings file not found, please set settings")
+    disablestart = True
+
 
 mem = psutil.virtual_memory()
 
 tab_layout1 = [
     [sg.Image('test_img.png', expand_x=True, expand_y=True,key = "-IMAGE-")],
-    [sg.Multiline(size=(30, 5),disabled = True, autoscroll = True, key='-MLINE-')],
-    [sg.Button('Start',key='-START-'),sg.Button('Stop',key='-STOP-',disabled=True), sg.Button('Generate Video', disabled=False,key='-GENVIDEO-'),sg.InputText(key='-VIDEONAMEINPUT-', enable_events=True),sg.FolderBrowse('select folder',initial_folder=dir_path,key='-FOlDERBROWSER-')],
+    [sg.Multiline(default_text="/".join(loglist),size=(30, 5),disabled = True, autoscroll = True, key='-MLINE-')],
+    [sg.Button('Start',key='-START-',disabled = disablestart),sg.Button('Stop',key='-STOP-',disabled=True), sg.Button('Generate Video', disabled=False,key='-GENVIDEO-'),sg.InputText(key='-IMAGESFOLDERINPUT-', enable_events=True),sg.FolderBrowse('select folder',key='-FOlDERBROWSER-')],
 ]
 
 tab_layout2 = [
     [sg.Text("Step/Distance: ")],
-    [sg.Radio('Start from zero steps', 1,default=True,enable_events=True, key='R1'), sg.Radio("Start with today's steps",1, enable_events=True, key='R2')],
-    [sg.Text("Save Frames (Needed to Generate Video): ")],
-    [sg.Radio('yes', 2,default=True, enable_events=True, key='R1'), sg.Radio('No',2, enable_events=True, key='R2')]
+    [sg.Checkbox('Start from zero steps', default=settings['startFromZeroSteps'],enable_events=True, key='-STARTFROMZEROSTEPS-')],
+    [sg.Text("Video Generation: ")],
+    [sg.Checkbox('Save Frames (Needed to Generate Video)', default=settings['saveFrames'],enable_events=True, key='-SAVEFRAMES-')],
+    [sg.Text("Cloud db settings: ")],
+    [sg.Text("Redis Server: "),sg.InputText(default_text=settings['redisServer'],key='-REDISSERVER-', enable_events=True)],
+    [sg.Text("Redis Port: "),sg.InputText(default_text=settings['redisPort'],key='-REDISPORT-', enable_events=True)],
+    [sg.Text("Redis Server User: "),sg.InputText(default_text=settings['redisUser'],key='-REDISUSER-', enable_events=True)],
+    [sg.Text("Redis Server Password: "),sg.InputText(default_text=settings['redisPassword'],key='-REDISPASS-', enable_events=True)],
+    [sg.Text("BBimg key: "),sg.InputText(settings['BBimgKey'],key='-BBIMGKEY-', enable_events=True)],  
+    [sg.Button('Save settings',key='-SAVESETTINGS-')]   
     ]
 
-layout = [[sg.TabGroup([[sg.Tab("Stream", tab_layout1), sg.Tab("Stream options", tab_layout2)]])]]
+layout = [[sg.TabGroup([[sg.Tab("Stream", tab_layout1), sg.Tab("Stream Settings", tab_layout2)]])]]
 
 window = sg.Window('MIRL Server', layout, keep_on_top=True,finalize=True)
 window['-MLINE-'].expand(expand_x=True)
 event, values = window.read(timeout=10)
 
-startFromZero = True
-last_Img = None
-save_images = True
-clear_day = True
-StartingDateTime = datetime.now()
-foldername = StartingDateTime.strftime("Session_%Y-%m-%d_%H_%M_%S")
-loglist = []
 
 def generate_video(foldername):
     ffmpeg.input(foldername+'/*.png', pattern_type='glob', framerate=1).output(foldername+'.mp4',loglevel="quiet").run(overwrite_output=True)
@@ -73,6 +85,13 @@ def checkDict(di):
 def StartServer():
     logdata('Starting')
     print('Starting')
+    rds = RedisController(
+    settings['redisServer'],# 'redis-15456.c308.sa-east-1-1.ec2.redns.redis-cloud.com',
+    int(settings['redisPort']),# 15456
+    settings['redisUser'],# streamingserver
+    settings['redisPassword'],# E-5X|?]B2:Cy0Lso]"_|PqlE*
+    settings['BBimgKey'],#40c55ae70e20ccebe2d7e90343434180
+    )
     if rds.flushServer():
         logdata('Server flushed.')
     else:
@@ -86,9 +105,7 @@ def StartServer():
         print('Server init faild')
     
     logdata('Time: ' + StartingDateTime.strftime("%Y-%m-%d %H:%M:%S"))
-
-    
-    logdata('Seting BBImg')
+    return rds
     
 
 DataDict = {'steps':[],'distance':[],'heartrates':[]}
@@ -97,6 +114,8 @@ init_steps = None
 init_dist = None
 pubSubListening = False
 message = None
+anonymize = True
+
 while True:
     event, values = window.read(timeout=10)
     
@@ -107,22 +126,35 @@ while True:
     if event == sg.WINDOW_CLOSED:
         break
     
-    if event == '-VIDEONAMEINPUT-':
+    if event == '-SAVESETTINGS-':
+        setingsDict = {"redisServer":values['-REDISSERVER-'],
+                       "redisPort":values['-REDISPORT-'],
+                       "redisUser":values['-REDISUSER-'],
+                       "redisPassword":values['-REDISPASS-'],
+                       "BBimgKey":values['-BBIMGKEY-'],
+                       "startFromZeroSteps":values['-STARTFROMZEROSTEPS-'],
+                       "saveFrames":values['-SAVEFRAMES-']
+                       }
+
+        with open('settings.json', 'w') as f:
+            json.dump(setingsDict, f)
+
+    if event == '-IMAGESFOLDERINPUT-':
         #print(event,values)
-        window['-VIDEONAMEINPUT-'].Update(values['-VIDEONAMEINPUT-'].replace(dir_path,'').replace('/',''))
+        window['-IMAGESFOLDERINPUT-'].Update(values['-IMAGESFOLDERINPUT-'].split("/")[-1])
 
     if event == '-GENVIDEO-':
         #print(values)
         logdata('Generating Video')
-        generate_video(values['-VIDEONAMEINPUT-'])
+        generate_video(values['-IMAGESFOLDERINPUT-'])
 
     if event == '-START-':
-        StartServer()
+        rds = StartServer()
         pubSubListening = True
         window['-START-'].update(disabled=True)
         window['-STOP-'].update(disabled=False)
         window['-GENVIDEO-'].update(disabled=True)
-        window['-VIDEONAMEINPUT-'].Update(foldername)
+        window['-IMAGESFOLDERINPUT-'].Update(foldername)
 
     if event == '-STOP-':
         DataDict = {'steps':[],'distance':[],'heartrates':[]}
@@ -152,18 +184,22 @@ while True:
                     init_steps = int(dataUpdate.split(",")[1])
 
         elif message['data'] == 'hset':
+
             if key == 'imMetaDataJson':
                 imJSON = rds.getImgJson()
                 logdata('URL: '+imJSON['url']+'Timestamp: '+imJSON['timestamp']) 
                 last_Img = ui.downloadImgbb(imJSON,saveToStreamLogs = True,finalimgsize=(1280,720))
-        
+            if anonymize:
+                last_Img = getImgAnonymized(last_Img).convert("RGBA")
+
         if len(loglist) > 0:
             #print(loglist)
             window['-MLINE-'].update('\n'.join(loglist))
 
         if checkDict(DataDict):
-            frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img,startFromZero = True, init_dist= init_dist, init_steps = init_steps)
-            saveImage(frame)
+            frame = ui.GenerateFrame(distanceData = DataDict['distance'],heartRateData=DataDict['heartrates'],stepsData=DataDict['steps'],photo=last_Img,startFromZero = settings['startFromZeroSteps'], init_dist= init_dist, init_steps = init_steps)
+            if settings['saveFrames']:
+                saveImage(frame)
             frame.thumbnail((1024, 512))
             window['-IMAGE-'].update(data=ui.image_to_data(frame), size=(1024,512))
         
