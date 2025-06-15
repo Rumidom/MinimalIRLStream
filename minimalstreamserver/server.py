@@ -190,7 +190,7 @@ while True:
                 logdata('URL: '+imJSON['url']+'Timestamp: '+imJSON['timestamp']) 
                 last_Img = ui.downloadImgbb(imJSON,saveToStreamLogs = True,finalimgsize=(1280,720))
             if anonymize:
-                last_Img = getImgAnonymized(last_Img).convert("RGBA")
+                last_Img = getImgAnonymized(last_Img,box=True).convert("RGBA")
 
         if len(loglist) > 0:
             #print(loglist)

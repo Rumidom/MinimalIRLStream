@@ -2,9 +2,7 @@
 - stream controls and status on app
 - send exceptions to server
 - add no internet warning on app
+- fix change from wifi to celular and vice versa connection drop
 - add "signal lost" "mesurement log off" icons on server 
-- fix OS killing script, due to memory leak
-- back to login page on disconnect
 - save password and bt device data locally
-- add load settings from file
-
+- add ring and battery bubble 
